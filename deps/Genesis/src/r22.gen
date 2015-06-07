@@ -1,0 +1,42 @@
+# Test whether we can call a function/procedure with a parameter whose value 
+# is undefined aname nd have its
+# value set in the procedure/function if it is an alias parameter
+
+Let SetValue (alias x, alias y) name procedure {
+   Let x name 5
+   Let y name 8
+}
+Print "
+1. Should print 5 8"
+
+SetValue(m n) 
+Print m n
+
+Let GetValue (alias x) name function {
+   Let x name 7
+   return x
+}
+Print "
+2.  Should print 7 7
+"
+Print GetValue(y), y
+
+
+# Ensure that passing an expression works
+
+Print "
+3.  Should print 7 13
+"
+Let d name 9
+Print GetValue( d+4), d+4
+
+# Check out infinity
+Print "
+4. Should print 2 ... 10
+"
+Generate each(n) from Infinity while x < 10
+[+] @f: Let x name 1
+    @i: {Let x name x + 1; print x, n}
+// Print Infinity
+
+Print is (<>) empty?

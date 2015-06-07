@@ -1,0 +1,17 @@
+# Checking let id name exp type statements (no aliases)
+
+Print "Checking naming ..."
+Let a name 1
+Let b name a + 2
+Let c name 3 + b
+print "Should print 1, then 3,  then 6"
+print a
+print b
+print c
+let a name b * c
+let c name a * b
+let b name b / 2
+print "Should print 18, then 1.5, then 54"
+print a
+print b
+print c

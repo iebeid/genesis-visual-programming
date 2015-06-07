@@ -1,0 +1,48 @@
+# Check out some procedures
+
+let add (m) into (alias n) name procedure {let n name n + m}
+{let k name 1}
+add (1) into (k)
+print k
+let everyother (lst) name procedure {
+   generate each(n) from lst 
+    [+]@beginning: {let even name 0 let count name 0}
+       @each: { select even = 0 -> { let even name 1
+                                     print n
+				     add (1) into (count)
+				   }
+		       even = 1 -> { let even name 0 }
+              } 
+       @ending: {print count "elements printed"}
+}
+
+everyother (<2 8 4 5 6 3 7 9>)
+
+let bump (alias x) name procedure {
+   let x name x + 1
+}
+let y name 3
+print "y=" y
+bump(y)
+print "y=" y
+
+let swap (alias m alias n) name procedure {
+   let t name n;  print "t=" t
+   let n name m;  print "n=" n
+   let m name t;  print "m=" m
+}
+
+let x name 5
+let y name 6
+swap (x y)
+print x
+print y
+let sort (lst) name procedure {
+   generate each (m) from lst 
+    [+]  generate each (n) from lst
+        [+] select m > n -> swap(m n)
+}
+
+let nos name <2 8 4 5 6 3 7 9>
+sort (nos)
+print nos

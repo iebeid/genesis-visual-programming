@@ -1,0 +1,269 @@
+# Test functionality of insert ... before, insert ... after, delete, append
+# First try appending and deleteing in flat lists
+print "
+1. Should print:
+<>
+<1>
+<1 2>
+<1 2 3>
+<1 2 3 4>
+"
+
+
+let l name <>
+generate each(n) from <1 2 3 4>
+[+]
+    { append n onto l
+      print l
+    }
+
+print "
+2. Should print:
+<>
+<<1 2 3>>
+<<1 2 3 > <4 5 6>> 
+<<1 2 3 > <4 5 6>  <7 8 9 >>
+<<1 2 3 > <4 5 6>  <7 8 9 > 17>
+<<1 2 3 > <4 5 6>  <7 8 9 > 17>
+"
+let l name <>
+append <1 2 3> onto l;  print l
+append <4 5 6> onto l;  print l
+append <7 8 9> onto l;  print l
+let save name l
+append 17 onto  l; print l
+print save
+
+# Now try appending to interior lists using subscripts
+print "
+3. Should print 
+<<1 2 3 \"eof\"> <4 5 6>  <7 8 9 >> 
+<<1 2 3 \"eof\"> <4 5 6 \"eof\">  <7 8 9 >> 
+<<1 2 3 \"eof\"> <4 5 6 \"eof\">  <7 8 9 \"eof\">> 
+"
+let l name  <<1 2 3 > <4 5 6>  <7 8 9 >>
+append "eof" onto l[1]
+print l
+append "eof" onto l[2]
+print l
+append "eof"  onto l[3]
+print l
+
+
+# Now try appending to an interor list accessed via an iterator
+print "
+4. Should print:
+<<1 2 3 \"eof\"> <4 5 6>  <7 8 9 >> 
+<<1 2 3 \"eof\"> <4 5 6 \"eof\">  <7 8 9 >> 
+<<1 2 3 \"eof\"> <4 5 6 \"eof\">  <7 8 9 \"eof\">> 
+"
+let l name  <<1 2 3 > <4 5 6>  <7 8 9 >>
+generate each (n) from l 
+ [+] {
+     append "eof" onto n
+     print l
+   }
+
+# Now try deleting using subscripts from a flat list
+print  "
+5. Should print:
+<1 2 3 4>
+<2 3 4>
+<3 4>
+<4>
+<>
+"
+let l name < 1 2 3 4>
+print l
+delete l[1]; print l
+delete l[1]; print l
+delete l[1]; print l
+delete l[1]; print l
+
+# Now try deleting using iterator from a flat list
+print  "
+6. Should print :
+<2 3 4>
+<3 4>
+<4>
+<>
+"
+let l name <1 2 3 4>
+
+generate each (n) from l
+[+] {
+     delete n
+     print "L=" L
+    }
+
+# Now try deleting using iterator from a flat list
+print  "
+7. Should print :
+<1 2 3 4>
+<2 3 4>
+<3 4>
+<4>
+<>
+"
+let l name <1 2 3 4>
+
+generate each (n) from l
+[+] {
+     print "L=" L
+     delete n
+    }
+print "L=" L
+# Now let's try deleting sublists from a flat list
+print "
+8. Should print:
+<<1 2 3 > <4 5 6>  <7 8 9 >>
+<<4 5 6>  <7 8 9 >>
+<<7 8 9 >>
+<>
+"
+let l name  <<1 2 3 > <4 5 6>  <7 8 9 >>
+generate each (n) from l 
+ [+] {
+     print l
+     delete n
+   }
+
+# Now lets try deleting elements from a sublists accessed via subscripted iterator
+print "
+9. Should print:
+<<1 3 > <4 5 6>  <7 8 9 >>
+<<1 3 > <4 6>  <7 8 9 >>
+<<1 3 > <4 6>  <7 9 >>
+"
+let l name  <<1 2 3 > <4 5 6>  <7 8 9 >>
+generate each (n) from l 
+ [+] {
+     delete n[2]
+     print l
+   }
+
+# Now lets try deleting elements from a  sublists accessed via double gen
+print "
+10. Should print:
+<<1 3 > <4 5 6>  <7 8 9 >>
+<<1 3 > <4 6>  <7 8 9 >>
+<<1 3 > <4 6>  <7 9 >>
+"
+let add (m) too (alias n) name procedure {let n name n + m }
+
+let l name  <<1 2 3 > <4 5 6>  <7 8 9 >>
+generate each (n) from l 
+ [+] generate each (k) from n
+ [+]@beginning: {let i name 1}
+    @each: {select {i = 2 -> delete k; }
+           add (1) too (i)
+           }
+    @ending: {print l }
+
+
+
+# Now try insert exp before l[i]
+print "
+11. Should print
+<\"New\" 1  2  3>
+<\"New\" 1 \"New\" 2  3>
+<\"New\" 1 \"New\" 2 \"New\" 3>
+"
+let l name <1 2 3>
+let new name "New"
+insert "New" before l[1]; print l
+insert new before l[3]; print l
+insert l[3]  before l[5]; print l
+
+# Now try insert exp before n, where n is an iterator
+print "
+12. Should print:
+<\"New\" 1  2  3>
+<\"New\" 1 \"New\" 2  3>
+<\"New\" 1 \"New\" 2 \"New\" 3>
+"
+
+let l name <1 2 3>
+generate each(n) from l
+[+] {insert "New" before n print l}
+
+
+let x name "!"
+let l name <<1 2 3 > <4 5 6>  <7 8 9 >>
+
+print "
+Now starting from <<1 2 3 > <4 5 6>  <7 8 9 >>
+repeatedly print the list with an '!' inserted before
+each element of each sublist, and then delete the '!'
+and print the list again
+"
+generate each (pos) from <1 2 3> 
+[+]{ 
+    generate each (n) from  l
+   [+] {insert x before n[pos] 
+       print "lmodified=" l
+       delete n[pos] # this deletes what was just inserted
+       print "lrestored=" l
+       }
+    print l
+    print "----------------------------"
+   }
+
+print "
+13. Should print:
+<<2 3 > <4 5 6>  <7 8 9 >>
+<<2 3 > <5 6>  <7 8 9 >>
+<<2 3 > <5 6>  <8 9 >>
+"
+generate each (n) from  l
+ [+] {
+    delete n[1] 
+    print  l
+    }
+print l
+
+# Finally, let's try insert expr after list-exp
+# First, try it using a subscript-specified list expression
+print "
+14. Should print:
+<1 \"inserted\" 2 3 4>
+<1 \"inserted\" 2  \"inserted\" 3 4>
+<1 \"inserted\" 2 \"inserted\" 3 \"inserted\" 4>
+<1 \"inserted\" 2 \"inserted\" 3 \"inserted\" 4 \"inserted\"> 
+"
+Let l name <1 2 3 4>
+let i name 1
+
+insert "inserted" after l[i]; print l; let i name i + 2 
+insert "inserted" after l[i]; print l; add (2) too (i)
+insert "inserted" after l[i]; print l; add (2) too (i)
+insert "inserted" after l[i]; print l; add (2) too (i)
+
+# Note that attempts to insert after using an iterator can
+# easily result in infinite loops.  In the example below
+# we see if we have just added an element to the list
+# if so then we must skip it
+print "
+15. Should print:
+<1 \"inserted\" 2 3 4>
+<1 \"inserted\" 2  \"inserted\" 3 4>
+<1 \"inserted\" 2 \"inserted\" 3 \"inserted\" 4>
+<1 \"inserted\" 2 \"inserted\" 3 \"inserted\" 4 \"inserted\"> 
+"
+Let l name <1 2 3 4>
+generate each (n) from l [+]
+  @beginning: {let i name 1}
+  @each: { select  
+             i = 1 -> {insert "inserted" after n; let i name 0; print L}
+	     i = 0 -> add (1) too (i);
+         }
+   
+#Let l name <1 2 3 4>
+#generate each (n) from l [+]
+             #{
+	      #insert "inserted" after n; 
+	      #insert "another" after n; 
+	      #insert "again" after n; 
+	      #print "n=" n 
+	      #print "l=" l
+	     ##} 

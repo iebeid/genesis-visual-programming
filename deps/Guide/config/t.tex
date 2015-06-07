@@ -1,0 +1,62 @@
+%latex
+%\document[fancyheadings,twocolumn]{article}
+\documentclass[10pt,twocolumn]{article}
+\pagestyle{plain}
+\parskip=5.5pt plus.5pt minus .5pt
+\oddsidemargin 0.0in
+\evensidemargin 0.0in
+\topmargin -1.4in
+\textwidth 10.25in
+\textheight 7.5in
+\pagestyle{headings}
+%\lfoot{t}
+%\cfoot{\thepage}
+%\rfoot{\today}
+\input{macros}
+\begin{document}
+\bc
+\large\bf t
+\ec
+\small
+\begin{verbatim}
+void Rectangle::read(inputbuffer &buffer) {
+}
+
+void Rectangle::write(ostream &){
+}
+
+void Rectangle::draw(char ch) {
+   int anchorRow, anchorCol;
+   Location loc  = getLocation();
+   anchorRow = loc.getRow();
+   anchorCol = loc.getCol();
+   move (anchorRow,anchorCol);
+   // Draw left side
+   int row = anchorRow;
+   int col = anchorCol;
+   int n = getSize();
+   addch(ch);
+   while (row < anchorRow + n - 2) {
+       row++;
+       move(row,col);
+       addch(ch);
+   }
+   while (col > anchorCol - n/2 + 2) {
+       col--;
+       move(row,col);
+       addch(ch);
+   }
+   while (row > anchorRow) {
+       row--;   // up one, left
+       move(row,col);
+       addch(ch);
+   }
+   while (col < anchorCol) {
+        col++;  // up one, left
+       move(row,col);
+       addch(ch);
+   }
+}
+
+\end{verbatim}
+\end{document}

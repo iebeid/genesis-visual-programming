@@ -1,0 +1,162 @@
+# Access via iterators
+print "Should print 
+1 
+2 
+3"
+print "-------------------------="
+Let l name < 1 2 3 >
+generate each (n) from l [+] print n
+print "=========================="
+
+print "Should print 
+<1 2 3>
+<1 2 3>"
+print "--------------------------"
+let l name <l l>
+generate each (n) from l [+]  print n
+print "=========================="
+
+print "Should print 
+1 2 3
+4 5 6"
+print "--------------------------"
+let l name <<1 2 3> <4 5 6>>
+generate each (n) from l 
+[+] print n[1],  n[2],   n[3]
+print "=========================="
+
+print "Should print
+1 5 3
+7 11 9"
+print "--------------------------"
+let m name <[<1 2 3> <4 5 6>] [<7 8 9> <10 11 12>]>
+generate each (n) from m   
+[+] print n[1][1], n[2][2], n[1][3]
+print "=========================="
+
+# double generate
+print "Should print
+<1 2 3> 
+<4 5 6>
+<7 8 9>
+<10 11 12>"
+print "--------------------------"
+generate each (n) from m 
+[+]  generate each (k) from n 
+[+]  print k
+print "=========================="
+
+# triple generater
+print "Should print (triple generation)"
+let list name <1 2 3 4 5 6 7 8 9 10 11 12>
+generate each (n) from list [+] print n
+print "--------------------------"
+
+generate each (n) from m 
+[+]  generate each (k) from n 
+[+]  generate each (l) from k 
+[+]  print l
+print "=========================="
+# Now check for lhs assignment
+print "Should print
+<1 2 3>
+4
+<4 4 4>
+3
+<4 4 4>
+"
+print "--------------------------"
+unalias l let l name <1 2 3>
+let m name 4
+print l
+print m
+generate each (n) from l 
+ [+] {let n name m }
+print l
+let m name m-1 
+print m
+print l
+print "=========================="
+
+# and lhs alias
+print "Should print
+<5 5 5>
+4
+<4 4 4>
+"
+print "--------------------------"
+let l name <1 2 3>
+let m name 5
+generate each (n) from l 
+ [+] {let n alias m }
+print l
+let m name 4
+print m
+print l
+print "=========================="
+
+# Check aliasing to an iterator via let x alias iterator
+# The concept here is that the use of an iterator should
+# be identical to the use of the the subscripted list that
+# is being iterated.  Thus, if n iterates to x[3], then
+#   let t name x[3] should be equivalent to let t name n
+#   let t alias x[3] should be equivalent to let t alias n
+print "Should print
+1
+aliased
+2
+aliased
+3
+aliased
+<aliased aliased aliased>
+"
+let l name <1 2 3>
+let m name 9
+generate each(n) from l 
+[+]  {let unaliased name n; let unaliased name "unaliased" print n
+      let aliased alias n;  let aliased name "aliased" print n
+     }
+    #[+] let new name <n n n> print new
+
+print l 
+#let n name n-1 print n
+print l 
+print "=========================="
+
+# Check aliasing to an iterator in a list, using <...alias iterator >
+# The concept here is that the use of an iterator should
+# be identical to the use of the the subscripted list that
+# is being iterated.  Thus, if n iterates to x[3], then
+#   let t name x[3] should be equivalent to let t name n
+#   let t alias x[3] should be equivalent to let t alias n
+print "Should print
+...
+<1 1>
+<7 1>
+<2 2>
+<7 2>
+<3 3>
+<7 3>
+Generate done
+<7 7 7>
+<7 3>
+<aliased 3>
+< 7 7 aliased>
+"
+print "--------------------------"
+let l name <1 2 3>
+let m name 9
+generate each(n) from l 
+[+]  {let new name <alias n n> 
+      print new 
+      let n name 7 
+      print new}
+print "Generate done"
+print l 
+print new
+let new[1] name "aliased"
+print new
+print l
+print "=========================="
+# Ensure that lhs naming is equivalent to subscript naming
+

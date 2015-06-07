@@ -1,0 +1,62 @@
+# Miscellaneous enhancements not previously incorporated into 
+# the regression testing system
+# Append should a labeled expression
+Set precision (0)
+Print "1. Should print
+<a1:1 a2:2 a3:3 a4:4>
+"
+Let L name <>
+Append "a1":1 onto L
+Append "a2":2 onto L
+Append "a3":3 onto L
+Append "a4":4 onto L
+
+print L
+
+print "2. Should print
+<b11:11 a1:1 b12:12 a2:2 b13:13 a3:3 b14:14 a4:4 b15:15 >
+"
+
+Insert "b15":15 after L[4]
+Insert "b14":14 before L[4]
+Insert "b13":13 before L[3]
+Insert "b12":12 before L[2]
+Insert "b11":11 before L[1]
+
+Print L
+
+Print "3. Should print
+<a1:1 a2:2 a3:3 a4:4>
+"
+Delete  L["b11"]
+Delete  L["b12"]
+Delete  L["b13"]
+Delete  L["b14"]
+Delete  L["b15"]
+
+print L
+
+
+print "4. Should print
+<b11:11 a1:1 b12:12 a2:2 b13:13 a3:3 b14:14 a4:4 b15:15>
+"
+
+Insert "b15":15 after L[4]
+Insert "b14":14 before L[4]
+Insert "b13":13 before L[3]
+Insert "b12":12 before L[2]
+Insert "b11":11 before L[1]
+
+Print L
+
+
+
+Print "3. Should print
+<b11:11 b12:12 b13:13 b14:14 b15:15>
+"
+Delete  L["a1"]
+Delete  L["a2"]
+Delete  L["a3"]
+Delete  L["a4"]
+
+Print L

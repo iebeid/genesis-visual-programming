@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="function">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="input" type="xs:string"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="stickynote">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="value">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:byte">
+                      <xs:attribute name="id" type="xs:string"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="print" type="xs:string"/>
+        <xs:element name="list">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="value">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:byte">
+                      <xs:attribute name="id" type="xs:byte"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="loop">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="task">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="first" type="xs:string"/>
+                    <xs:element name="iterator" type="xs:string"/>
+                    <xs:element name="last" type="xs:string"/>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:byte"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="source" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+

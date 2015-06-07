@@ -1,0 +1,51 @@
+# Test for iterations using reals
+
+Generate each(n) from  1 to 2 by 1
+[+] Print n
+print "The following should print .3 to 10.3 by steps of size 1"
+
+Generate each (n) from 1/3 thru 10 + 1/3 by 1.0
+ [+] Print n
+
+print "The following should print 10.1 to 1.1 by steps of size 1"
+
+Generate each (n) from 10.1 downto 1.1 by 1
+ [+] Print n
+
+print "The following should print 10.1 to 1.1 by steps of size 1"
+
+Generate each (n) from 0.1 to 10.1 by 1
+ [+] Print n
+
+
+print "The following should print 1.4 to 2.9 by steps of size .1"
+
+Generate each (n) from 1.4 to 2.9 by 0.1
+ [+] Print n
+
+Let a name 1.5
+Let b name 2.9
+Let h name 0.1
+
+print "The following should print 1.5 to 2.9 by steps of size .1"
+
+Generate each (n) from a to b by h
+ [+] Print n
+
+Let sign(x) name function {
+  Select x < 0 -> let ans name 0
+         otherwise -> let ans name 1
+  return ans
+}
+Let f(x) name function { return x*x-1 }
+
+Let FindRoot (a, b, h) name function {
+   Let s name sign(f(a))
+      Generate each(x) from a to b by h  while sign(f(x)) = s
+         return x
+         }
+print "The following should print a value slightly larger than 1"
+print findroot(0.0, 2.0, 0.01)
+
+# Test for non-evaluation of condition when the source list is empty
+generate each (n) from <> while n[1] != 7

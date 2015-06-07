@@ -1,0 +1,6 @@
+Let L name <1 2 3 4 5>
+Generate each (n) from L
+[+]
+	@first: Let s name 0
+	@iter: Let s name s + n
+	@last: Print "Sum = " s

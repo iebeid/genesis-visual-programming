@@ -1,0 +1,115 @@
+#  Check for various function/function-call combinations
+# 1. Check for various types of  single/multiple-word names
+# id (param)
+
+let incr (n) name function {return n+1}
+let n name incr(5); print n
+
+# id id id (p)
+let is bigger than five (n) name function { 
+   Let ans name n 
+   select n > 5 -> Let ans name n + 1
+   Return ans
+}
+print is bigger than five (4)
+print is bigger than five (9)
+
+# id id id (p) id
+let this is a funny func (n) yes name function {return n+1}
+let answer name this is a funny func (9) yes 
+print answer
+
+# id id (p) id id
+let this is a funny func (n) is it name function {return n+1}
+let answer name this is a funny func (9) is it 
+print answer
+
+# id id (p1) id (p2)
+
+let the max of (m) nd (n) name function { 
+  let max name m;
+  select n > m -> let max name n
+  return max
+  }
+print the max of (15) nd (7) 
+print the max of (7) nd (15) 
+# id id (p1) id id (p2)
+let the max of (m) a n d  (n) name function { 
+  let max name m;
+  select n > m -> let max name n
+  return max
+  }
+print the max of (5) a n d  (17) 
+print the max of (17) a n d  (5) 
+
+# id id (p1) id id (p2) id
+
+let the max of (m) a n d  (n) awk name function { 
+  let max name m;
+  select n > m -> let max name n
+  return max
+  }
+print the max of (25) a n d  (17) awk 
+print the max of (17) a n d  (25) awk 
+
+# 2. Try with more than one parameter
+let f (m n ) name function { return m + n}
+print f(3 4) 
+print f(5 7)
+
+# 3. Try aliasing in parameters
+
+Let n name 5
+let g (alias m) name function {let m name m + 1; return m}
+print g(n)
+print n
+
+print "---- Two aliases --------"
+let a name 3
+let b name 4
+let c alias b
+let h (alias m alias n) name function {let m name m + n; let n name m *n return n}
+print h(a b )
+print a  b  c
+
+# Can I still call the original function g?
+print g(a)
+
+# 4. Passing an iterator to a function by value
+let lst name <1 2 3>
+generate each(n) from lst [+] print incr(n)
+print lst
+
+# 5. Passing an iterator to a function by alias
+generate each(n) from lst [+] print g(n)
+print lst
+
+# 6. Passing subscripted variables to function by value
+print incr(lst[1]);
+print incr(lst[2]);
+print incr(lst[3]);
+print lst
+
+
+# 7. Passing subscripted variables to function by alias
+print g(lst[1]);
+print h(lst[1] lst[2]);
+print g(lst[3]);
+print lst
+let s (lst) name procedure {
+   generate each(n) from lst [+] print n
+   }
+print g(lst[3])
+s(lst);
+
+# 8.  Recursion works:
+#let h(x) name function {}
+let fact (n) name  function{
+   Let ans name 1
+   select  n = 0 -> Let ans name 1
+           n > 0 -> Let ans name (n * fact(n -1) )
+   Return ans
+       
+}
+print fact (5)
+

@@ -1,0 +1,599 @@
+# Test new features added
+# First confirm that the "when" clause works when present
+# and is optional 
+Print "Should print
+21 
+37 
+-9 "
+Print "-----------------------"
+Set precision(0)
+Let L name < 10 21 30 37 -9 8>
+Generate each (n) from L
+[+] when ((n % 2)*(n%2) = 1 )
+    Print n
+Print "======================="
+
+# Now see if semiColons terminate Print
+echo "Should print:
+1 and 1 are the same value
+2 is larger than 1
+2 is larger than 1
+2 and 2 are the same value "
+
+Print "-----------------------"
+Generate each(a) from 1 to 2
+[+] 
+   Generate each(b) from 1 to 2
+   [+]
+       Select 
+       a > b -> Print a "is larger than" b;
+       a < b -> Print b "is larger than" a;
+       a = b -> Print a "and" b "are the same value"
+Print "======================="
+
+# Now see if commas enable leading +signs in print lists
+echo "Should print:
+1 and 1 are the same value
+2 is larger than 1
+2 is larger than 1
+2 and 2 are the same value "
+
+Print "-----------------------"
+Generate each(a) from 1 to 2
+[+] 
+   Generate each(b) from 1 to 2
+   [+]
+       Select 
+       a > b -> Print a "is larger than", +b;
+       a < b -> Print +b "is larger than", +a;
+       a = b -> Print +a, "and", +b "are the same value"
+Print "======================="
+Set precision(2)
+Print "Should print:
+0.50
+2.00
+4.00
+6.00
+8.00 "
+Print "-----------------------"
+Let g (alias x) name generator {
+   @f: Let x name 1
+   @i: {Let x name x + 1}
+   @l: return x < 5
+}
+Let y name 0
+g(y)
+[+]
+@f:{Print y/2}
+[+]
+@i:print 2*y
+
+Print "======================="
+Print "Should print:
+Generator:@first
+Task:@first
+Generator:@iter
+Generator:@last
+Task:@iter
+Generator:@iter
+Generator:@last
+Task:@iter
+Generator:@iter
+Generator:@last
+Task:@iter
+Generator:@iter
+Generator:@last
+Task:@last
+180 "
+Print "-----------------------"
+Set precision(0)
+
+Let For(alias n) in (L) name generator {
+ @f: {
+      Print "Generator:@first"
+      Select 
+         is (L) empty? -> Generate each (n) from L 
+         otherwise -> Let n name iterator(L[1])
+     }
+ @i: {
+      Print "Generator:@iter"
+      Move(n)
+     }
+ @l: { 
+      Print "Generator:@last"
+      Return on(n)
+     }
+}
+
+Let L name <30 40 50 60>
+Let m name 80
+For (m) in (L) while m < 1000
+[+] 
+@f: {
+     Print "Task:@first" 
+     Let sum name 0 
+    }
+@i: {
+     Print "Task:@iter" 
+     Let sum name sum + m; 
+    }
+@l: {
+     Print "Task:@last" 
+     Print sum
+    }
+
+Print "======================="
+Print "Should print:
+Running pairs on an empty list
+Running pairs on a list of length 1
+Running pairs on a list of length 2
+( one , two )
+Running pairs on an odd list with more than 2 elements
+(one,two) (3,4)
+Running pairs on an even list with more than 2 elements
+(one,two) (3,4) (5,6) "
+Print "-----------------------"
+Let For each pair(alias p1, alias p2) from (L) name
+Generator {
+   @f: Select  
+        (length of(L) >= 2) ->  {
+            Let p1 name iterator(L[1])
+            Let p2 name iterator(L[2])
+        }
+        length of(L) = 1 -> {
+            Let p1 name iterator(L[1])
+            Generate each (p2) from iterator(p1) while false
+            Move (p2);
+        }       
+        otherwise ->  {
+            Generate each (p1) from L
+            Generate each (p2) from L
+        }
+   @i: {
+          Move(p1); Move(p1);
+          Move(p2); Move(p2);
+       }
+   @l: {
+          Return on(p1) and on (p2)
+       }
+}
+Print "Running pairs on an empty list"
+Let L name < >
+For each pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Print "Running pairs on a list of length 1"
+Let L name <"one" >
+For each pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Unalias p1; Unalias p2
+Print "Running pairs on a list of length 2"
+Let L name <"one" "two" >
+For each pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Unalias p1; Unalias p2
+Print "Running pairs on an odd list with more than 2 elements"
+Let L name <"one" "two"  3 4 5 >
+For each pair (p1,p2) from (L)
+[+] @i: Select
+          on(p2) ->  Echo "(" p1 "," p2 ")" ' '
+    @l: Print ""
+Unalias p1; Unalias p2
+Print "Running pairs on an even list with more than 2 elements"
+Let L name <"one" "two"  3 4 5 6 >
+For each pair (p1,p2) from (L)
+[+] @i: Select
+      on(p2) -> Echo "(" p1 "," p2 ")" " "
+    @l: Print ""
+
+Print "======================="
+Print "Should print:
+xxxxxx 
+"
+Print "-----------------------"
+Let Loop (n) times name
+Generator {
+   @f: Let count name 1
+   @i: Let count name count + 1
+   @l: Return count <= n
+}
+Loop (6) times
+[+] Echo "x"
+print ""
+Unalias n
+Let n name -3
+Loop (n) times
+[+] echo "x"
+Print ""
+
+Print "======================="
+Print "Should print:
+Running overlapping pairs on an empty list
+Running overlapping pairs on a list of length 1
+Running overlapping pairs on a list of length 2
+( one , two )
+Running overlapping pairs on an odd list with more than 2 elements
+(one,two) (two,3) (3,4) (4,5)
+Running overlapping pairs on an even list with more than 2 elements
+(one,two) (two,3) (3,4) (4,5) (5,6)"
+Print "-----------------------"
+
+Let For each overlapping pair(alias p1, alias p2) from (L) name
+Generator {
+   @f: Select  
+        (length of(L) >= 2) ->  {
+            Let p1 name iterator(L[1])
+            Let p2 name iterator(L[2])
+        }
+        length of(L) = 1 -> {
+            Let p1 name iterator(L[1])
+            Generate each (p2) from iterator(p1) while false
+            Move (p2);
+        }       
+        otherwise ->  { # Length 0
+            Generate each (p1) from L
+            Generate each (p2) from L
+        }
+   @i: {
+          Move(p1); 
+          Move(p2);
+       }
+   @l: {
+          Return on(p1) and on (p2)
+       }
+}
+Unalias p1
+Unalias p2
+Print "Running overlapping pairs on an empty list"
+Let L name < >
+For each overlapping pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Print "Running overlapping pairs on a list of length 1"
+Let L name <"one" >
+For each overlapping pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Unalias p1; Unalias p2
+Print "Running overlapping pairs on a list of length 2"
+Let L name <"one" "two" >
+For each overlapping pair (p1,p2) from (L)
+[+] Print "(" p1 "," p2 ")"
+
+Unalias p1; Unalias p2
+Print "Running overlapping pairs on an odd list with more than 2 elements"
+Let L name <"one" "two"  3 4 5 >
+For each overlapping pair (p1,p2) from (L)
+[+] @i: Select
+          on(p2) ->  Echo "(" p1 "," p2 ")" ' '
+    @l: Print ""
+Unalias p1; Unalias p2
+Print "Running overlapping pairs on an even list with more than 2 elements"
+Let L name <"one" "two"  3 4 5 6 >
+For each overlapping pair (p1,p2) from (L)
+[+] @i: Select
+      on(p2) -> Echo "(" p1 "," p2 ")" " "
+    @l: Print ""
+
+Print "======================="
+Print "Should print
+1
+3
+5
+7
+9
+2
+4
+6
+8
+10"
+Print "-----------------------" 
+Let For everyother (alias x) in (L) name
+Generator {
+  @f: Select
+        is (L) empty? -> Generate each(x) from L
+        otherwise -> Let x name iterator(L[1]) 
+  @i: {Move(x); Move(x) }
+  @l: Return on(x)
+}
+Unalias p1
+Let L name < >
+For everyother (p1) in (L)
+[+] Print p1
+
+Let L name <1>
+For everyother (p1) in (L)
+[+] Print p1
+
+Unalias p1; 
+Let L name <3 4 5>
+For everyother (p1) in (L)
+[+] Print p1
+
+Unalias p1; 
+Let L name <7 8 9 10 >
+For everyother (p1) in (L)
+[+] Print p1
+Let For everyother (alias x) in (L) name
+Generator {
+  @f: Select
+        is (L) empty? -> Generate each(x) from L
+        otherwise -> {
+           Let x name iterator(L[1]) 
+           Move(x);
+        }
+
+  @i: {Move(x); Move(x) }
+  @l: Return on(x)
+}
+Unalias p1; 
+Generate each (L) from <
+ [] [1] [1 2] [3 4 5] [5 6 7 8 9 10 ]
+>
+[+] {
+    unalias p1
+    For everyother (p1) in (L)
+    [+] Print p1
+ }
+
+Print "======================="
+Print "Should print:
+1
+2
+3
+4"
+Print "-----------------------"
+Let Loop while (alias boolean) name
+Generator {
+   @last: Return boolean
+}
+
+Let n name 1
+Let boolean name n < 10
+Loop while (boolean)
+[+]
+@iter: {
+   Print n
+   Let n name n    + 1
+   Let boolean name n < 5
+}
+
+Let Loop while (alias boolean) name
+Generator {
+   @last: Return boolean
+}
+
+/*
+  This next one requires a bit of explanation
+  We define a preorder traversal of a tree 
+  Represented in Lisp-like fashion.  Consider
+  the tree represented by the indentation:
+    A
+      B 
+        C
+        D
+        E
+      F
+        G
+        H
+   In Lisp-like form:
+    (A
+      (B 
+        (C 
+        D 
+        E  )
+      (F
+        (G 
+        H  )
+      )
+     )
+*/
+Let PrintInfo (msg; alias current; alias s) name 
+Procedure {
+Let debug name false
+Select 
+  debug -> {
+   Echo msg ":"
+   Print ""
+   Select on(current) -> Print "Current =" iterator(current);
+          off(current) -> Print "Current is off the list:" iterator(current)
+   Print "The stack now contains:"
+   Generate each (n) from s
+   [+] Print iterator(n)
+}
+}
+Let Traverse (T) in preorder using(alias current) name
+Generator {
+   @first: {
+      Let stack name <>
+      # Set current to the first node in the list (tree root)
+      Select 
+         is (T) empty? -> {
+            Generate each(current) from T 
+         }
+         otherwise -> {
+            Move(current) to (iterator(T[1]))
+         }
+      #Print "init done: current =" current "and stack=" stack, on(current)
+   }
+   @iter: # Move to the next location and push current location on stack
+   {  
+      PrintInfo ("Entering Generator:@iter", iterator(current), stack) 
+      Move(current);
+      PrintInfo ("Current moved", iterator(current), stack) 
+      Select 
+        off (current) and not is (stack) empty? -> { 
+           Let stilloff name true
+           Loop while (stilloff) 
+           [+] @i: {
+              # Finished a level; pop and move to next
+              #Print "Finished list, popping stack:" stack
+              Let x alias stack[1]
+              PrintInfo("Retrieving x from stack",iterator(x),stack)
+              Move (current) to (x)
+              PrintInfo("After moving current to x",iterator(current),stack)
+              unalias x
+              #Reset(current)
+              Delete (stack[1])
+              Move (current)
+              PrintInfo("After popping",iterator(current),stack)
+              Let stilloff name off (current) and not is (stack) empty? 
+              #Print "stilloff=" stilloff
+         
+           }
+        }
+        #off(current) and is (stack) empty? -> { # All done
+           #Print "All done"
+        #}
+      Select
+         on(current) and is (current) a list? -> {
+            PrintInfo ("-->Processing a subtree", iterator(current),stack);
+            # Push onto stack
+            #Move (current) 
+            Select 
+               is (stack) empty? ->
+                  Let stack name <(iterator(current))>
+               otherwise -> {
+      {PrintInfo("Adding before stack[1] ",iterator(stack[1]),stack)}
+                  Let t name iterator(current)
+                  Insert iterator(t) before stack[1]
+                  unalias t
+                  #Insert (current) before stack[1]
+                  #Let stack name  iterator(current) + stack
+               }
+      {PrintInfo("-->After pushing onto stack ",iterator(current),stack)}
+            Move (current) to (iterator(current[1]))
+         }
+      {PrintInfo("Leaving Generator:@iter ",iterator(current),stack)}
+      #Print "------------------------------"
+   } 
+   @last: {
+#      PrintInfo ( "Generator:@last", iterator(current), stack)
+      Return on(current) or not is (stack) empty?
+   }
+}
+Print "======================="
+Print "Should print:
+
+1
+1 2
+1 2 3
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 2 3 4 5 6
+1 <*2 3> 4 5 6
+1 <*2 3> <*4> 5 6
+Print "-----------------------" 
+Let testdata name <
+   []
+   [1]
+   [1 2]
+   [ 1 2 3]
+   [1 2 3 4 5 ]
+   [1 [2 3] 4 5]
+   [1 2 [3 4] 5 ]
+   [1 2 3 [4 5] ]
+   [1 [2 [3 4]] 5 ]
+   [1 [2 [3 4] 5 ]]
+   [1 [2 [3 4] 5 ] 6]
+   [1 [2 [3 4 5] ] 6]
+   [1 [2 3] [4 5]  6]
+   [1 [2 3] [4 5  6]]
+   [1 [2 3] [4 [5]  6]]
+   [1 [2 3] [4 [5  6]]]
+   [1 [2 3] [4 5  [6]]]
+   [1 [[2 3] [4 5  [6]]]]
+   [1 [[2 3] [<4> 5  [6]]]]
+>
+Set precision(0)
+Generate each(T) from testdata
+[+] {
+Unalias n
+Traverse (T) in preorder using (n)
+[+] Echo  n " "
+Print ""
+}
+
+Print "======================="
+Print "Should print:
+1 2 3 4 5 6 7 8 9
+1 4 7 2 5 8 3 6 9"
+Print "-----------------------" 
+Let Access (M) row by row as (alias n) name
+Generator {
+@f: {Let r name iterator(M[1])
+     Let n name iterator(r[1])
+    }
+@i: {
+   Select 
+   on(n) -> {
+      Move (n);
+      Select 
+         off(n) -> {
+            Move(r);
+            Select 
+                  on(r) -> {
+               Move (n) to (iterator(r[1])) 
+            }
+      }
+   }             
+}
+@l: Return on(r)
+}
+Let matrix name <
+ [ 1 2 3 ]
+ [ 4 5 6 ]
+ [ 7 8 9 ]
+>
+unalias n
+Let n name 0
+Access (matrix) row by row as (n) 
+[+]
+@i: { Echo  n " "}
+@l: Print ""
+
+Let Access (M) col by col as (alias c) name
+Generator {
+@f: {Let r name iterator(M[1])
+     Let col name 1
+     Let c name iterator(r[col])
+     Let numcols name length of (r)
+    }
+@i: {
+   Move(r)
+   Select 
+      on(r) ->  {
+         Move (c) to (iterator(r[col]))
+         
+      }
+      otherwise -> {
+         Move (r) to (iterator(M[1]))
+         Let col name col + 1
+      }
+   }             
+@l: Return col <= numcols
+}
+
+Unalias n
+Access (matrix) col by col as (n)
+[+] # Printing task
+@i: { Echo  n " "}
+@l: Print ""
+/*
+########### Cut in here #################
+Print "======================="
+
+Print "-----------------------" 
+*/

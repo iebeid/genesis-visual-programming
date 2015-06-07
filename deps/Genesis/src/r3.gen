@@ -1,0 +1,25 @@
+# Check let id alias id
+let a name 1
+let b alias a
+print "The next two should be 1"
+print a
+print b
+let b name 3
+
+print "The next two should be 3"
+print a 
+print b
+let c name 2
+let d alias c
+let d name 4
+print "The next five values should be 4"
+print c 
+print d
+
+let a alias c;
+print a
+print c
+print d
+
+print "And the next value should be 3"
+print b

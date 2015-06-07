@@ -1,0 +1,9 @@
+define (f,
+   function (x) {
+      _print('calling f with');
+      define (x,_add_number(x,_sub_number(85,23)));
+		_print( x )
+   }
+);
+define (z,3);
+f(z)

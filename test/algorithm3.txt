@@ -1,0 +1,6 @@
+Let a name <1 2 3 4 5> 
+ Generate each ( n ) from a  
+ [+] 
+   @first: {  }
+   @iter: { Print n } 
+   @last: {  }

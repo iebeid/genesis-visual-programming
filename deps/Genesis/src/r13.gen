@@ -1,0 +1,47 @@
+# Check iterator functions and procedures
+Print "Should print
+1  5
+2  6
+3  7
+4  8
+"
+
+Let L name < 5 6 7 8 >
+Generate each(n) from L 
+[+] Print position of (n) n
+Print "Should print
+false true 
+true false
+1  5
+2  6
+3  7
+4  8
+"
+Generate each (n) from L; 
+
+print on(n)   off(n)
+move (n) to (1)
+print on(n)   off(n)
+Generate each(m) from <1 2 3 4>
+[+] {
+      move (n) to (m+0)
+      print m  n
+    }
+
+Print "Should print
+false true 
+true false
+1  5
+2  6
+3  7
+4  8
+"
+Generate each (n) from L;
+print on(n)   off(n)
+reset (n)
+print on(n)   off(n)
+Generate each(m) from <1 2 3 4>
+[+] {
+      move (n) to (m+0)
+      print m  n
+    }

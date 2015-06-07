@@ -1,0 +1,62 @@
+/*  Check to see if records work*/ 
+Set precision(0)
+// 1. Can we create literal labels?
+Let person name <
+        "FirstName": "Larry"
+        "LastName":  "Morell"
+        "Address": [
+                   "Street": "103 Elm"
+                   "City":   "Dogwood"
+                   "State":  "AR"
+                   "Zip":    72833
+                 ]
+      >
+
+
+Print "1. Should print
+Larry
+Morell
+103 Elm
+Dogwood
+AR
+72833
+"
+Let a name person ["FirstName"]
+Print person["FirstName"]
+Print person["LastName"]
+Print person["Address"] ["Street"]
+Print person["Address"] ["City"]
+Print person["Address"] ["State"]
+Print person["Address"] ["Zip"]
+
+Print "2. Should print 
+Larry
+Morell
+103 Elm
+Dogwood
+AR
+72833
+"
+Let a name < "P1": person  "p2": person>
+Print a["P1"]["FirstName"]
+Print a["P1"]["LastName"]
+Print a[1]["Address"] ["Street"]
+Print a[1]["Address"] ["City"]
+Print a[1]["Address"] ["State"]
+Print a[1]["Address"] ["Zip"]
+
+Print "3. Should print 
+Larry
+Morell
+103 Elm
+Dogwood
+AR
+72833
+"
+Print a["p2"]["FirstName"]
+Print a["p2"]["LastName"]
+Print a[2]["Address"] ["Street"]
+Print a[2]["Address"] ["City"]
+Print a[2]["Address"] ["State"]
+Print a[2]["Address"] ["Zip"]
+

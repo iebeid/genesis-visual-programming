@@ -1,0 +1,103 @@
+# Check the ability to call built-in functions
+#  integer(v) = the integer portion of a number
+Print "Checking integer ..."
+print "====================="
+print "
+Should print 4.0"
+print integer(4.3)
+
+print "
+Should print -7.0"
+print integer(-7.8)
+
+print "
+Should print 0.0"
+print integer(-0.0)
+
+print "
+Should print 0.0"
+print integer(0.0)
+
+Print "
+Checking fractional ..."
+print "====================="
+# fractional(v) = the fractional portion of a number
+print "
+Should print 0.299999..."
+print fractional(4.3)
+
+print "
+Should print 0.399999...."
+print fractional(7.4)
+
+print "
+Should print -3.0"
+print fractional(-3.0)
+
+print "
+Should print 0.0"
+print fractional(-0.0)
+
+print "
+Should print 0.0"
+print fractional(0.0)
+
+print "
+Should print -0.299999...."
+print fractional(-4.3)
+
+# remainder of (m) divided_by (n) = m % n
+Print "
+Checking remainder ..."
+let rem(m,n) name function {return remainder of (m) divided by (n)}
+print "
+Should print 1.0"
+print rem(13,4)
+
+print "
+Should print 3.0"
+print rem(13,5)
+
+print "
+Should print 1.0"
+print rem(13,-2)
+
+print "
+Should print -1.0"
+print rem(-13,2)
+
+print "
+Should print 1.0"
+print rem(13.7,-3.2)
+
+print "
+Should print  -1.0"
+print rem(-13, -2)
+
+print "
+Checking quotient ..."
+let quo(m,n) name function {return quotient of (m) divided by (n)}
+print "
+Should print 3.0"
+print quo(13,4)
+
+print "
+Should print 2.0"
+print quo(13,5)
+
+print "
+Should print -6.0"
+print quo(13,-2)
+
+print "
+Should print -6.0"
+print quo(-13,2)
+
+print "
+Should print -4.0"
+print quo(13.7,-3.2)
+
+print "
+Should print  6.0"
+print quo(-13, -2)
+

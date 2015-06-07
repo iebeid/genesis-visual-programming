@@ -1,0 +1,10 @@
+#
+let gcd(m,n) name function {
+    Select 
+      m < n -> let ans name  gcd (m, n-m)
+      n < m -> let ans name  gcd (m-n, n)
+      otherwise -> let ans name n
+    return ans
+}
+
+print gcd(6642 7081)

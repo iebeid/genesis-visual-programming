@@ -1,0 +1,37 @@
+// Test 1: single rule
+<m> ::= 1 done
+// Test 2: additional non-conflicting rule
+<m>->  2
+// Test 3: rule with a different lhs
+<n> ::=  3
+// Test 4: linkage between two rules w/o conflict
+<n> ::= <m> 4
+// Test 5: Rule with longer rhs
+<m> ::= 5 6
+// Now let's test propagation
+// Test 6: See if propagation of length 1 works, error message should
+//         be issued for duplicate <m>
+<m> ::=
+// Test 7: See if propagation of length 2 works
+<empty>
+<n> <empty> <m> 7
+// Test 8: See if propagation works when the nullable nt is added after the rule
+<p> ::= 1
+<n> ::= <p> <empty> 8
+<p> 
+// Now test to see if adding a rule that causes an LL conflict
+// gives an error message
+// <m> 3
+//<n> 3 4 <n> 6
+// <m>   // null
+// <n> <m> 6 <n> 9 <n>
+// <m> 1 2 <n>
+// <n> <m> <m> <m> 10
+// <m> <n> 1 2
+// <m> <n>
+// <m> <n>
+// <m> 1 2 <n>
+// <n> 1 2 <m> 7
+// <m>
+
+

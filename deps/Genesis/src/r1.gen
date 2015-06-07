@@ -1,0 +1,31 @@
+# Expressions
+# -- Elementary expressions
+print "Primary expressions"
+print 5
+
+# -- Terms
+print ""
+print "Factors"
+print "5*3 =" 5*3
+print "5/8 =" 5/8
+print "5*3/5 =" 5*3/5
+print "5/3*3 =" 5/3*3
+print "5/(3*5) =" 5/(3*5)
+
+print ""
+print "Terms"
+
+print "5+3 =" 5+3 
+print "6-4 =" 6-4
+print "1+2/3 ="  1+2/3 
+print "1/2-3 =" 1/2-3
+print "2*3+4 =" 2*3+4
+
+print ""
+print "Checking associativity"
+print "6-3-2 =" 6-3-2
+print "6+3+2 =" 6+3+2
+print "6*3*2 =" 6*3*2
+print "6/3/2 =" 6/3/2
+
+

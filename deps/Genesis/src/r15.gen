@@ -1,0 +1,172 @@
+# Test to ensure that "iterator(n)" works
+
+# 1. Iterators can be used as a source
+print  "1. Should print
+1
+2
+3
+---------
+4 
+5
+6
+"
+Let L name <1 2 3 4 5 6>
+Generate each (n) from L until n > 3 [+] print n
+print "---------"
+Generate each (m) from iterator(n) [+] print m
+
+print  "2. Should print
+1
+2
+3
+---------
+4 
+5
+6
+"
+
+Let L name <1 2 3 4 5 6>
+Generate each(n) from L while n < 4[+] print n
+print "---------"
+Generate each (n) from iterator(n) [+] print n
+
+# 2. Copy iterators directly to other names
+Let L name < "a" "b" "c" "d" "e" "f">
+print  "3. Should print
+a
+b
+c
+---------
+d 
+e
+f
+"
+Generate each (n) from L until n >= "c" [+] print n
+unalias m; Let m name iterator(n)
+print m
+move(m)
+print "---------"
+Generate each (x) from iterator(m) [+] print x
+
+Let L name < "a" "b" "c" "d" "e" "f">
+print  "4. Should print
+a
+b
+c
+---------
+d 
+e
+f
+"
+Generate each (x) from L while x < "c" [+] print x
+unalias m
+Let m name iterator(x)
+print m
+move(m)
+print "---------"
+print m
+move (m)
+print m
+move (m)
+print m
+
+# A copy of an iterator should not change the iterator, but would change 
+# the list being iterated across.  This requires some care, because reusing
+# an iterator as a source requires using 'iterator()'
+
+print "
+5. Should print
+1 
+2 
+3
+new value
+new value
+new value
+"
+
+Let L name < 1 2 3 4 5 6>
+#
+unalias m
+Generate each(n) from L while n < 4 [+] print n
+let m name iterator(n)
+#print iterator(m);
+Generate each(x) from iterator(m)[+] let x name "new value"
+#print L
+Generate each(x) from iterator(n) [+] print x
+
+
+# Try swapping iterators
+print "
+Should print
+1 
+2 
+3
+1
+2
+---------
+3
+4
+5
+6
+4 
+5
+6
+"
+
+Let L name < 1 2 3 4 5 6>
+Generate each(n) from L while n < 4 [+] print n  # n is now posed at 4
+Generate each(m) from L while m < 3 [+] print m  # m is now posed at 3
+print "---------"
+Let t name iterator(n)
+unalias (n)
+Let n name iterator(m)
+unalias  m
+Let m name iterator(t)
+
+# n should now be posed at 3
+# m should now be posed at 4
+Generate each(x) from iterator(n) [+]print x 
+Generate each(x) from iterator(m) [+]print x 
+
+print "
+6.Should print
+1 
+2 
+3
+1
+2
+---------
+3
+4
+5
+6
+4 
+5
+6
+"
+# Lo and behold I believe there is no way to swap two iterators
+# This is because the target must be unaliased to prevent the 
+# iterator from being interpreted as a pass-through. but when you
+# do that, the linkage to the original arguments ins lost.
+ Let swap (alias m,alias n) name 
+ Procedure {
+   Let t name iterator(n)
+   unalias(n)
+   Let n name iterator(m)
+   unalias(m)
+   Let m name iterator(t)
+   print "Inside m=" iterator(m)
+   print "Inside n=" iterator(n)
+ }
+
+
+Let L name < 1 2 3 4 5 6>
+Generate each(n) from L while n < 4 [+] print n  # n is now posed at 4
+Generate each(m) from L while m < 3 [+] print m  # m is now posed at 3
+
+print "m=" iterator(m)
+print "n=" iterator(n)
+swap(iterator(m), iterator(n))
+print "m=" iterator(m)
+print "n=" iterator(n)
+

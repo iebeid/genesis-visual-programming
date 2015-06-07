@@ -1,0 +1,9 @@
+# Checking square root
+# Compute the distance between two points
+let sqr(x) name function { return x*x }
+Let distance(p1, p2) name function {
+  return square root of ((sqr(p1[1]-p2[1])) + (sqr(p1[2]-p2[2])))
+}
+Let point1 name <0,0>
+Let point2 name <3.2,4.1>
+print distance (point1,point2)

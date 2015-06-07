@@ -1,0 +1,54 @@
+# Simulation of reading from a file
+Let data name < 
+   ["Johnette" "Moody" 1997]
+   ["Larry" "Morell" 1998]
+   ["David" "Hoelzeman" 2000]
+   ["David" "Middleton" 1998]
+   ["Nobuyuki" "Nezu"  2001]
+   ["Roger" "Fang"    2001]
+   ["Sarah" "Robison" 1990]
+   ["Ron" "Robison" 1990]
+   ["Nancy" "Park" 2001]
+   ["Becky" "Cunningham" 2001]
+>
+Let descriptor name < 0 <>>  
+Let open (infile) name
+   Function {
+      return <pos:1, data:infile> 
+   }
+
+Let Reset (descriptor) name 
+   Procedure {
+      Let infile["pos"] name 1 
+   } 
+Let Read (alias record) from (descriptor) name
+   Procedure {
+      Select 
+         descriptor["pos"] > length of (descriptor["data"]) ->
+             Print "Trying to read a record that does not exist"
+         otherwise -> {
+             Let pos alias descriptor["pos"]
+             Let data name descriptor["data"]
+             Let record name data[pos]
+             Let pos name pos + 1 
+         }
+         Print "Got" record
+   }  
+
+Let eof(descriptor) name
+   Function {
+      Print "return" descriptor["pos"] >= length of (descriptor["data"])
+      return descriptor["pos"] >= length of (descriptor["data"])
+   } 
+
+
+Let infile name open(data)
+
+print 111
+While (not eof(infile)) 
+[+]{
+   print 999
+   Read (record) from (infile)
+   Print record
+}
+

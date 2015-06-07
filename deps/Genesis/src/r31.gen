@@ -1,0 +1,66 @@
+# Test to see if prepending works
+
+# First try with an empty list
+
+Let L name <>
+Prepend 'x' onto L
+
+Print 'Should print:
+<"x">
+<4 3 2 1>
+----------------'
+Print L
+
+Generate each(n) from < 1 2 3 4>
+[+]
+   @f: Let t name <>
+   @i: Prepend n onto t
+
+Print t
+# Now try it with a nested list
+
+Let animals name <
+  ["dog" 4]
+  ["cat" 4]
+  ["spider" 8]
+>
+
+Print '--------------------
+Should print:
+  <["mammal" "dog" 4] ["mammal" "cat" 4] ["insect" "spider" 8]>
+  <["mammal" "dog" 4] ["mammal" "cat" 4] ["insect" "spider" 8]>
+  < ["Land" "tree" 9] ["Water" "water lily" 1] ["Land" "flower" 5]>
+----------------
+'
+Prepend "mammal" onto animals[1]
+Prepend "mammal" onto animals[2]
+Prepend "insect" onto animals[3]
+
+Print animals
+#Try double nesting
+Let plants name <
+   ["tree" 9]
+   ["water lily" 1]
+   ["flower" 5]
+>
+Let life name <
+  animals 
+  plants
+>
+Prepend "Land" onto life[2][1]
+Prepend "Water" onto life[2][2]
+Prepend "Land" onto life[2][3]
+print life[1]
+print life[2]
+
+# Check to see if is (x) defined? works
+
+echo "Should print:
+true
+false
+"
+Print "--------------------"
+Let t name 1
+Print is (t) defined?
+Print is (turtledove) defined?
+

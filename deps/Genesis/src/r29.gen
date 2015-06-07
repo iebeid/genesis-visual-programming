@@ -1,0 +1,68 @@
+# Check to see if we can process a string as if it were a list
+
+# 
+# Checking literal string
+Print "1 Should print:
+a
+b
+c
+
+d
+e
+f
+
+g
+h
+i
+------------------"
+
+Generate each(n) from "abc def ghi"
+[+] print n
+
+# Checking function calls
+Print "2. Should print:
+a
+
+b
+
+c
+------------------"
+Let f() name function{
+  Return "a
+b
+c"
+}
+
+Generate each(n) from f()
+[+] print n
+
+# Checking subscripting
+Print "3. Should print:
+a
+b
+c
+d
+e
+f
+------------------"
+Let L name <"abc" "def">
+Generate each(n) from   L[1]
+[+] print n
+Generate each(n) from   L[2]
+[+] print n
+
+
+
+#Checking string variable
+Print "4. Should print:
+a
+b
+c
+d
+e
+f
+------------------"
+Let s name "abcdef"
+Generate each(n) from   s
+[+] Print n
+

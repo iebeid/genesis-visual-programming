@@ -1,0 +1,118 @@
+Print "1. Comparing literal lists"
+Print "Should Print
+true
+true
+false
+false"
+Print "----------------------"
+Print <> = <>
+Print < 1 2 "abcd" <"def" 18>> =  < 1 2 "abcd" <"def" 18>>
+Print <2> = <>
+Print < 1 2 "abcd" <"Def" 18>> =  < 1 2 "abcd" <"def" 18>>
+Print "----------------------"
+
+Print "2. Comparing literal lists against lists constructed with +
+Should Print:
+true
+true
+false
+false"
+
+
+Print "----------------------"
+
+Let L name <> + 7 + 8 + 9
+Print L = < 7 8 9>
+Print  < 7 8 9 > = L
+Let L name L + 8
+Print L = < 7 8 9>
+Print  < 7 8 9 > = L
+
+Print "----------------------"
+
+Print "3. Comparing literal lists against lists constructed with append
+Should Print:
+true
+true
+false
+false"
+
+Print "----------------------"
+Let L name <>
+Generate each(n) from  1 to 5
+[+] Append n onto L
+Print L = < 1 2 3 4 5>
+Print < 1 2 3 4 5> = L
+Append 9 onto L
+Print L = < 1 2 3 4 5>
+Print < 1 2 3 4 5> = L
+
+Print "----------------------"
+
+Print "4. Comparing lists built with + with those built with append
+Should Print:
+true
+true
+false
+false"
+
+Print "----------------------"
+Let L name <>
+Generate each(n) from  1 to 5
+[+] Append n onto L
+Let M name <>
+Generate each(n) from  1 to 5
+[+] Let M name M + n
+
+Print L = M
+Print M = L
+Append 9 onto L
+Print L = M
+Print M  = L
+
+Print "----------------------"
+
+Print "5. Comparing deep lists
+Should Print:
+true
+true
+true
+true
+false
+false
+false
+false"
+
+Print "----------------------"
+Generate each(n) from 1 to 3
+[+]
+   @first: Let L name <>
+   @iter: {
+      Generate each(r) from 3 to 7 
+      [+]
+         @first: Let  M name <>
+         @iter: Let  M name M + r
+      [+] when r %2 = 0
+         {  Append M onto L}
+   } 
+Generate each(n) from 1 to 3
+[+]
+   @first: Let X name <>
+   @iter: {
+      Generate each(r) from 3 to 7 
+      [+]
+         @first: Let  Y name <>
+         @iter: Let  Y name Y + r
+      [+] when r %2 = 0
+         {  Append Y onto X}
+    }
+Print M = Y
+Print L = X
+Print Y = M
+Print X = L
+Print M = X
+Print L = M
+Print X = M
+Print Y = L
+
+

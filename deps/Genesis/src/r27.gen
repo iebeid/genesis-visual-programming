@@ -1,0 +1,215 @@
+# Some miscellaneous new features
+# 1.  Using a function call on the lhs of a Let
+Print "1. Should print
+8
+<1 2 3 4>
+<2 3 4 5>
+<2 7 4 5>
+---------------------"
+Set precision(0)
+Let f(alias a) name function {
+   return a
+}
+Let b name 7
+Let f(b) name 8
+print b
+Let b name < 1 2 3>
+Let f(b) name f(b) + 4
+Print b
+Generate each(n) from b
+[+] Let f(n) name f(n) + 1
+Print b
+Let f(alias a) name function {
+   return a[2]
+}
+Generate each(n) from b
+[+] Let f(b) name f(b) + 1
+Print b
+
+# Try sublist
+
+
+
+Print "2. Should print 
+<1 2 3 4>
+<2 3 4>
+<3 4>
+<4>
+<>
+<<4 5 6> <7 8 9>>
+<5 6>
+<1 2 3>
+<2 3>
+<3>
+<4 5 6>
+<5 6>
+<6>
+<7 8 9>
+<8 9>
+<9>
+
+-----------------------
+"
+
+Let l name <1 2 3 4 >
+Generate each (n) from 1 to 5
+[+]
+@iter: print sublist of(L,position of(n))
+
+Let m name < <1 2 3> <4 5 6> <7 8 9>>
+Let t name sublist of (m,2)
+Print sublist of(t,1)
+Print sublist of(t[1],2)
+Generate each(n) from m
+[+]
+   Generate each(v) from 1 to 3
+   [+]  Print sublist of(n,v)
+
+
+Print "4. Should print 
+<2 3 4>
+<3 4>
+<4>
+<>
+<<4 5 6> <7 8 9>>
+<5 6>
+<1 2 3>
+<2 3>
+<5 6>
+<8 9>
+
+-----------------------
+"
+
+Let l name <1 2 3 4 >
+print tail of(L)
+
+print (tail of(tail of(L)))
+print tail of(tail of(tail of(L)))
+print tail of(tail of(tail of(tail of(L))))
+print tail of(tail of(tail of(tail of(tail of(L)))))
+
+Let m name < <1 2 3> <4 5 6> <7 8 9>>
+Let t name tail of (m)
+Print tail of(t)
+Print tail of(t[2])
+Generate each(n) from m
+[+] {
+    Print tail of(n)
+}
+
+# Now try splitting a list:
+
+Print "5. Should print 
+<> <1 2 3 4> 
+<> <1 2 3 4> 
+<1> <2 3 4> 
+<1 2> <3 4> 
+<1 2 3> <4> 
+<1 2 3 4> <>
+<1 2 3 4> <>
+-------------------------
+"
+Let L name < 1 2 3 4 >
+Generate each(n) from 0 to 6
+[+] {
+    Let L name < 1 2 3 4 >
+    Split (L) at (n) into (L1,L2)
+    Print L1 L2
+}
+
+
+
+Print "5. Should print 
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+------------------------- "
+Let Swap(alias m,alias n) name procedure {
+   Let t name m; Let m name n; Let n name t
+}
+
+Let Sort (L) name procedure {
+   Generate each(m) from L while on(next(m))
+   [+]  
+   @i:{
+      Generate each(n) from next(m)
+      [+] when ( n < smallest ) 
+      @first:
+         Move (smallest) to (m); 
+      @iter: 
+         Move (smallest) to (n)
+      @last:  
+         Swap(m,smallest) 
+   }
+}
+
+#Let L name < 21 4 21 33 33 345 >
+#Sort (L)
+#Print L
+#Stop
+Let check(L) name function {
+   Generate each(n) from L while n >= prev
+   [+]
+   @f: {Let prev name L[1] -1; Let sorted name true}
+   @i: {Let prev name n}
+   Return off(n)
+}
+
+Let Loop (n) times name
+Generator {
+   @f: Let count name 1
+   @i: Let count name count + 1
+   @l: Return count <= n
+}
+Let Loop until (alias cond) name
+Generator {
+   @last: Return not cond
+}
+
+Let const name 5
+Loop (5) times 
+[+]
+@iter:{
+   # Create a random array
+   Loop (const) times
+   [+] 
+   @f: Let L name <>
+   @i: Let L name L + random()%100 
+   # ------------------------------- #
+   
+   Sort(L)  # Sort the array
+   Select
+     check(L) -> Print "ok"
+     otherwise -> {Print "Sorting failed on" L; Stop}
+
+   Generate each(n) from L while not atlast(n);
+   Select 
+      ( on(n) and atlast(n) and n = L[length(L)]) ->  Print "ok"
+      otherwise -> Print "atlast failed for" L;
+   
+   #Print "Processing" L;
+   Let done name atfirst(n)
+   Loop until (done) 
+   [+] {Move(n) backward Let done name atfirst(n);
+      #  print n "on" on(n) "atfirst" atfirst(n)
+       }
+
+   Select
+      on(n) and atfirst(n) and n=L[1] -> print "ok"
+      otherwise -> Print "atfirst failed for" L
+}
+
+

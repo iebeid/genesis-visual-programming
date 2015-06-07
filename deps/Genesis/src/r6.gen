@@ -1,0 +1,272 @@
+# Check for Select stmt
+
+let a name 3;
+let b name 4;
+select 
+   a > b -> let max name a
+   b >= a -> let max name b
+print "Should print 4"
+print max
+
+select 
+   a > b -> {let max name a let var name "a" }
+   a <= b -> {let max name b let var name "b" }
+print "Should print b=4"
+print var, "=", max 
+
+let a name 4
+let b name 3
+select 
+   a > b -> {let max name a let var name "a" }
+   a <= b -> {let max name b let var name "b" }
+print "Should print a=4"
+#Nested select
+print var, "=", max 
+
+print "----------------------------------"
+Let a name 4
+Let b name 3
+Let c name 2
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print a=4"
+print var, "=", max 
+
+Let a name 4
+Let b name 2
+Let c name 3
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print a=4"
+
+print var, "=", max 
+
+Let a name 2
+Let b name 4
+Let c name 3
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 4
+Let c name 2
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 2
+Let b name 3
+Let c name 4
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print c=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 2
+Let c name 4
+select
+    a >= b ->
+       select {
+           a >= c -> {let max name a let var name "a" }
+           a <= c -> {let max name c let var name "c" }
+       }
+    a < b ->      
+       select {
+           b >= c -> {let max name b let var name "b" }
+           b <= c -> {let max name c let var name "c" }
+       }
+
+print "Should print c=4"
+print var, "=", max 
+
+
+Let a name 4
+Let b name 2
+Let c name 3
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+print "Should print a=4"
+print var, "=", max 
+
+Let a name 4
+Let b name 3
+Let c name 2
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print a=4"
+print var, "=", max 
+
+Let a name 2
+Let b name 4
+Let c name 3
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 4
+Let c name 2
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 2
+Let b name 3
+Let c name 4
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print c=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 2
+Let c name 4
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a >=b and a <= c -> {let max name c let var name "c" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print c=4"
+print var, "=", max 
+
+Let a name 4
+Let b name 2
+Let c name 3
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print a=4"
+print var, "=", max 
+
+Let a name 4
+Let b name 3
+Let c name 2
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print a=4"
+print var, "=", max 
+
+Let a name 2
+Let b name 4
+Let c name 3
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 4
+Let c name 2
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print b=4"
+print var, "=", max 
+
+Let a name 3
+Let b name 2
+Let c name 4
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print c=4"
+print var, "=", max 
+
+Let a name 2
+Let b name 3
+Let c name 4
+select
+    a >= b and a >= c ->{let max name a let var name "a" }
+    a < b and b >= c -> {let max name b let var name "b" }
+    a >=b and a <= c or a < b and b <= c -> {let max name c let var name "c" }
+
+print "Should print c=4"
+print var, "=", max 

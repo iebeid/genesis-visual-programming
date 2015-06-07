@@ -1,0 +1,22 @@
+# Check to see if function calls with no parameters work
+
+Let const() name function {return 7}
+print "Should print 7"
+print const()
+
+# Check to see if a procedure call with no parameters work
+Let Proc() name procedure {Print 7}
+print "Should print 7"
+proc()
+
+# Check to see if echo works
+
+print "Should print:
+hello there!"
+
+echo "hello "
+echo "there"
+echo "!"
+echo "
+"
+

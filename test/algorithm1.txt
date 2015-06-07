@@ -1,0 +1,49 @@
+Let list name <4 6 7 890 43 56 12 11 13 40 98 76 56 245 134 67 570>
+Let prime name <>
+Let fact name <>
+Generate each (n) from list
+[+] when ((n%2) != 0)
+      append n onto prime
+
+let fact (n) name  function{
+   Let ans name 1
+   select  n = 0 -> Let ans name 1
+           n > 0 -> Let ans name (n * fact(n -1) )
+   Return ans
+       
+}
+Generate each (n) from prime
+[+]
+	@first: { }
+	@iter: { append fact (n) onto fact }
+	@last: {} 
+
+Let Swap(alias m,alias n) name procedure {
+   Let t name m; Let m name n; Let n name t
+}
+
+Let Sort (L) name procedure {
+   Generate each(m) from L while on(next(m))
+   [+]  
+   @i:{
+      Generate each(n) from next(m)
+      [+] when ( n < smallest ) 
+		@first:
+			Move (smallest) to (m); 
+		@iter: 
+			Move (smallest) to (n)
+		@last:  
+			Swap(m,smallest) 
+   }
+}
+
+Sort (fact)
+
+Print "-------------------------"
+Print "Original List"
+Print list
+Print "Prime List"
+Print prime
+Print "Factorial List"
+Print fact
+

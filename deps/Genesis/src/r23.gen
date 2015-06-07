@@ -1,0 +1,31 @@
+/*
+   Check to see if length of(L) works
+*/
+
+Let l name <1 2 3 4 6>
+print length of (l)
+
+Let l name <1 2 3 4 6 9>
+print length of (l)
+
+/*
+   Check to see if single quotes work
+*/
+
+Let a name '"abcdefghijklmnopqrstuvwzyz"1234567890-=[],./~!@#$%^&*()_+\';:\'\\\''
+print 'Every keyboard character with escaped single quotes and escaped escapes'
+print a
+
+-- Check to see if additional single-line comments work
+
+// Check to see if mod % works
+
+print 'Should print 
+1
+2
+-2
+'
+let a name  (5 %2)
+print a
+print (8 %3)
+print (-9 %7)

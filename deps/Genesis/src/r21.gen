@@ -1,0 +1,123 @@
+# Test truth values as first class items
+
+Print "Should print
+true false
+ several times."
+Let t name true
+Let f name false
+Let L name <
+  [ true false ]
+  [ t f ]
+  [ (true or true) (false or false)]
+  [ (true or false) (true and false)]
+  [ (false or true) (false and true)]
+  
+>
+Generate each (p) from L
+[+] { print p[1]  p[2] }
+
+Print "Should print the truth table for and"
+Print "p     q     p and q"
+Let L name < t f >
+Generate each (p) from L
+[+] Generate each (q) from L
+    [+] Print p  q  p and q
+
+Print "Should print the truth table for or"
+Print "p     q     p or q"
+Generate each (p) from L
+[+] Generate each (q) from L
+    [+] Print p  q  p or q
+
+
+Print "Should print the truth table for not"
+Print "p     not p"
+Generate each (p) from L
+    [+] Print p  not p
+Print "DeMorgan's rules: and over or"
+Print "  p     q     r     p and (q or r)   p and q or p and r    Equivalent?"
+Let L name < t f >
+Generate each (p) from L
+[+] Generate each (q) from L
+    [+] Generate each (r) from L
+        [+] {
+              Let lhs name p and (q or r)  
+              Let rhs name p and q or p and r
+              echo p "  "  q  "   " r  "            " lhs "           " rhs
+              Select
+                 lhs = rhs -> {print "        yes"}
+                 lhs != rhs ->{print "        no"}
+            } 
+Let dem (p,q,r) name function {
+     return [(p or (q and r)), ((p or q ) and (p or r))]
+}
+Print "DeMorgan's rules: 'or' over 'and'"
+Print "  p     q     r     p and (q or r)   p and q or p and r    Equivalent?"
+Let L name < t f >
+Generate each (p) from L
+[+] Generate each (q) from L
+    [+] Generate each (r) from L
+        [+] {
+              Let ans name dem(p,q,r)
+              Let lhs name ans[1]
+              Let rhs name ans[2]
+              echo p "  "  q  "   " r  "            " lhs "           " rhs
+              Select
+                 lhs = rhs -> {print "        yes"}
+                 lhs != rhs ->{print "        no"}
+            } 
+
+
+Let dem (p,q,r,alias lhs,alias rhs) name procedure {
+     let lhs name p or (q and r)
+     Let rhs name  ((p or q ) and (p or r))
+}
+Print "DeMorgan's rules: 'or' over 'and' again"
+Print "  p     q     r     p and (q or r)   p and q or p and r    Equivalent?"
+Let L name < t f >
+Generate each (p) from L
+[+] Generate each (q) from L
+    [+] Generate each (r) from L
+        [+] {
+              dem(p,q,r,lhs,rhs)
+              echo p "  "  q  "   " r  "            " lhs "           " rhs
+              Select
+                 lhs = rhs -> {print "        yes"}
+                 lhs != rhs ->{print "        no"}
+            } 
+
+
+# Check precedence with respect to comparisons
+
+Print " Should print m=n or m != n
+  interspersed with Odd!
+"
+Generate each (n) from <2 3 4 5>
+[+] Generate each (m) from < 3 4 5 6 >
+    [+] {Select m < n or n < m -> {Print "m != n:"  m  n }
+               m <=n and n <= m ->  {Print "m = n:"  m  n }
+         Select
+               m = true -> {print "Odd!" }
+               m != true -> {print "Odd!" }
+        }
+
+# Check to see that logicals can be printed, and that they
+# can be compared
+print "Should print
+false
+false
+true
+false
+true
+false
+true
+true"
+print "-----------------------"
+print true < true
+print true < false
+print false < true
+print false < false
+print true <= true
+print true <= false
+print false <= true
+print false <= false

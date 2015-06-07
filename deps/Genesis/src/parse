@@ -1,0 +1,22 @@
+#!/bin/sh
+# parse -- parse a Genesis program
+#
+# Usage:
+#   parse [debug] file.gen
+#
+
+if [ $# = 0 ]; then
+   exec ./printdirections $0
+fi
+if [ ! -f Parser.class ]; then
+   make Parser > /dev/null
+fi 
+Option=""
+if [ $1 = debug ]; then
+   Option=$1
+   shift
+fi
+ 
+FileName=`echo $1.gen | sed 's/\.gen\.gen/.gen/'`
+java Parser $Option $FileName
+

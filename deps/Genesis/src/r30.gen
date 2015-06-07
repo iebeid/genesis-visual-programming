@@ -1,0 +1,29 @@
+# Ensure parsing an 'or' and an 'and' are not included as the last word
+# of a function call if the function does not have that reserved word
+Print "Ensuring 'or' and 'and' are not included in function name if not needed"
+Print "Should print:
+ok
+not ok
+-----------------"
+let deck1 name <>
+let deck2 name <1>
+Select 
+  not is (deck1) empty? or not is (deck2) empty? -> print "ok"
+  otherwise -> print "not ok"
+
+Select 
+  not is (deck1) empty? and not is (deck2) empty? -> print "ok"
+  otherwise -> print "not ok"
+
+Print "Ensuring 'or' and 'and' are included in function name if needed"
+Print "Should print:
+ok
+-----------------"
+Let funny (x) and name Function{
+   return x
+}
+
+Select 
+  funny (true) and or funny(false) and -> print "ok"
+  otherwise -> print "not ok"
+

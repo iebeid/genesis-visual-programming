@@ -1,0 +1,54 @@
+# Check boolean (TruthVal) values
+# Name truth values
+Print "Should print true false"
+Let s name true
+Let y name false
+print s y
+
+# Type checking operations
+Print "Should print 
+7 is a number
+1 is a number
+string is a string
+<true 2> is a list and is not empty
+<> is a list and is empty
+true is a truth value
+false is a truth value
+"
+Let n name 7
+Let x name is (n) a number? 
+Let list name < 1 "string" < s 2 > <> true s y>
+generate each (n) from list
+[+] Select 
+      is (n) a number? -> {print n "is a number"}
+      is (n) a string? -> {print n "is a string"}
+      is (n) a list? -> {echo n " is a list and is "
+                           Select !is (n) empty? -> echo "not "
+                         print "empty"
+                        }
+      is (n) a truth value? -> {print n "is a truth value"}
+
+# Check use of boolean functions
+
+Let does (L) contain (e) name function {
+   Generate each (n) from L  while not found
+   [+] @f: Let found name false
+       @i: Select
+              n = e -> {
+                   Let found name true
+              }
+   return found
+}
+Print "Should print:
+< 1 \"string\" < true 2 > true true false> contains 1: true
+< 1 \"string\" < true 2 > true true false> contains string: true
+< 1 \"string\" < true 2 > true true false> contains true: true
+< 1 \"string\" < true 2 > true true false> contains false: true
+< 1 \"string\" < true 2 > true true false> contains 7: false
+" 
+Let lst name < 1 "string" true false 7 <> <1 2 3> <3 <4 5> 7>>
+Generate each (n) from lst
+[+] Print list " contains "n":" Does (list) contain (n)
+
+Generate each (n) from lst
+[+] Print "Type of" n  "is" type of(n)

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.genesis.view.GenesisDevelopmentEnvironmentViewController">
+  <children>
+    <SplitPane dividerPositions="0.19674185463659147" focusTraversable="true" prefHeight="537.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="63.0">
+      <items>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <children>
+            <Accordion minWidth="154.0" prefHeight="535.0" prefWidth="154.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <expandedPane>
+                <TitledPane fx:id="x2" animated="false" text="Genesis">
+                  <content>
+                    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <children>
+                        <TreeView fx:id="controls" onDragDetected="#handleTreeMenuOnDragDetected" onDragDone="#handleTreeMenuOnDragDone" onDragOver="#handleTreeMenuOnDragOver" prefHeight="535.0" prefWidth="154.0" AnchorPane.bottomAnchor="-24.0" AnchorPane.leftAnchor="-2.0" AnchorPane.rightAnchor="-2.0" AnchorPane.topAnchor="-24.0" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </TitledPane>
+              </expandedPane>
+              <panes>
+                <TitledPane animated="false" expanded="false" styleClass="first-titled-pane" text="Project">
+                  <content>
+                    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <children>
+                        <TreeView fx:id="project" prefHeight="465.0" prefWidth="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </TitledPane>
+                <fx:reference source="x2" />
+                <TitledPane fx:id="x1" animated="false" text="Tools">
+                  <content>
+                    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <children>
+                        <TreeView fx:id="treeview" prefHeight="487.0" prefWidth="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </TitledPane>
+              </panes>
+            </Accordion>
+          </children>
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <children>
+            <SplitPane dividerPositions="0.2551594746716698" focusTraversable="true" orientation="VERTICAL" prefHeight="598.0" prefWidth="436.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                  <children>
+                    <TextArea fx:id="codeArea" prefHeight="133.0" prefWidth="636.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                  <children>
+                    <SplitPane dividerPositions="0.5" focusTraversable="true" orientation="VERTICAL" prefHeight="438.0" prefWidth="636.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                      <items>
+                        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                          <children>
+                            <Pane fx:id="targetBox" onDragDropped="#onDragDropped" onDragOver="#onDragOver" onMouseDragged="#onMouseDragged" onMouseEntered="#onMouseEntered" onMouseExited="#onMouseExited" onMousePressed="#onMousePressed" onMouseReleased="#onMouseReleased" prefHeight="194.0" prefWidth="634.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                          </children>
+                        </AnchorPane>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                          <children>
+                            <TextArea fx:id="outputArea" prefHeight="158.0" prefWidth="56.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                          </children>
+                        </AnchorPane>
+                      </items>
+                    </SplitPane>
+                  </children>
+                </AnchorPane>
+              </items>
+            </SplitPane>
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+    <MenuBar fx:id="menuBar" layoutY="38.0">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="New" fx:id="newMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Open" fx:id="loadMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Close" fx:id="closeMenu" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Save" fx:id="saveMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Delete" fx:id="deleteMenu" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Run">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Compile" fx:id="runMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Play" fx:id="playMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Clear" fx:id="clearMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="Generate Code" fx:id="generateMenu" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleButtonAction" text="About" fx:id="aboutMenu" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <HBox id="HBox" alignment="CENTER" spacing="15.0" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="40.0">
+      <children>
+        <Button id="new" fx:id="newButton" mnemonicParsing="false" onAction="#handleButtonAction" text="New" />
+        <Button fx:id="save" mnemonicParsing="false" onAction="#handleButtonAction" text="Save" />
+        <Button fx:id="play" mnemonicParsing="false" onAction="#handleButtonAction" text="Play" />
+        <Button fx:id="clear" mnemonicParsing="false" onAction="#handleButtonAction" text="Clear" />
+        <Button fx:id="run" mnemonicParsing="false" onAction="#handleButtonAction" text="Run Code" />
+        <Button fx:id="load" mnemonicParsing="false" text="Load" />
+      </children>
+    </HBox>
+  </children>
+</AnchorPane>

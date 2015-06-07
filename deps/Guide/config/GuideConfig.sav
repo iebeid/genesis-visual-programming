@@ -1,0 +1,56 @@
+import java.io.*;
+import java.util.*;
+
+public class GuideConfig {
+
+	Map<String, ProgrammingElement> map = null;
+	BufferedReader br = null;
+	FileReader fr = null;
+	
+	GuideConfig(String file) {
+		try {
+			this.fr = new FileReader(file);
+			this.br = new BufferedReader(fr);
+			map = new LinkedHashMap<String, ProgrammingElement>();
+			
+			String label = null;
+			String format = null;
+			String toolTip = null;
+			String action = null;
+			int i = 0;
+			while ((label=br.readLine()) != null) {
+				label = clean(label);
+				format =br.readLine();
+				format = clean(format);
+				format = addNewLines(format);
+				action = Integer.toString(i);
+				toolTip =br.readLine();
+				toolTip = clean(toolTip);
+				ProgrammingElement pe = new ProgrammingElement(label, toolTip, format, action);
+				map.put(action, pe);
+				i++;
+			}
+		}
+		catch (FileNotFoundException fex) {
+		
+		}
+		catch (IOException ex) {
+		
+		}
+	}
+		public Map getMap() {
+			return map;
+		}
+		
+		protected String clean(String s) {
+			s = s.trim();
+			s = s.substring(s.indexOf("=") + 1);
+			s = s.trim();
+			return s;
+		}
+		
+		protected String addNewLines(String s) {
+			s = s.replaceAll("\\\\n", "\n");
+			return s;
+		}
+}

@@ -1,0 +1,50 @@
+# Check new conditional syntax on pipeline
+# For a bonus, check the set precision
+{print " Should print:
+Initialization 1: c set to 5
+Initialization 2: b set to 1
+Processing 1
+   ... less than 5
+   ... setting p to 7
+   ... less than 5 -> adding 1 to b
+Processing 20
+   ... greater than 10
+Processing 40
+   ... greater than 10
+Termininating 1
+Termininating 2
+Termininating 3
+b=2.0000
+l=<4.0000 20.0000 40.0000>
+p=7.0000
+--------------------------
+"
+}
+Let printit () name procedure {}
+set precision(0);  # No decimal point 
+Let l name < 1 20 40 >
+Generate each (n) from  l
+[+] @f: {let c name 5; print "Initialization 1: c set to 5"}
+[+] when (1=1) 
+@i: Print "Processing " n
+[+] when n> 10 
+@i: print "   ... greater than 10"
+[+] when (n< c) {print "   ... less than " c;  let n name 4}
+[+] {let p name 7 print  "   ... p set to 7" }
+[+] @l: print "Termininating 1"
+[+] when (n< c) 
+     @f: {let b name 1;  print  "Initialization 2: b set to 1"}
+           @i: {let b name b + 1; print  "   ... less than 5 -> adding  1 to b"}
+           @l: {print "Terminating 2"}
+[+] @l: {print "Terminating 3"}
+[+] when 1=1
+    printit ()
+[+] when (1=1)
+    printit ()
+
+
+set precision (4);  # 4 decimal places
+print "b=" b
+print "l=" l
+print "p=" p
+

@@ -1,0 +1,9 @@
+# Checking overloading of +
+Set precision(0)
+Let values name <"abc" 123 <"a" 10> [<"nasty" "nesting">]>
+print 123 + "xyz"
+Generate each (v1) from values
+{+} Generate each (v2) from values
+    {+}  {Print v1  "+" v2 "=" v1 + v2}
+
+print < 1 2 3 > + < < 4 5 6 >>

@@ -1,0 +1,94 @@
+#!/bin/sh
+# run -- run Genesis interpreter
+#
+# Usage:
+#   run [-h] [-d] [-v] [-h] file.gen ...
+#
+#   where file.gen is a genesis algorithm
+
+PATH="/opt/jdk1.5.0_03/bin:$PATH"
+if [ $# = -h ]; then
+   exec ./printdirections $0
+fi
+FileList=""
+Option=""
+while [ $# -gt 0 ]; do
+   case $1 in
+      -d ) Option="${Option} -d";;
+      -t ) Option="${Option} -t";;
+      -v ) Option="${Option} -v";;
+      -h ) Option="${Option} -h";;
+       * ) FileList="$FileList $1";;
+   esac 
+   shift
+done
+Files=
+for f in $FileList
+do
+   if [ -f "$f.gen" ]; then
+      f="$f.gen"
+   fi
+   if [ ! -f "$f" ]; then
+      echo $f not found ... check your spelling and try again
+      exit
+   fi
+   Files="$Files $f"
+done
+Files=`echo $Files`  # Remove leading and trailing blanks and compress
+#echo Process $Files
+#if [ ! -f GenesisInterpreter.class ]; then
+#   make Interpreter > /dev/null
+#fi
+# If you want to move this file to directory other than where Genesis is installed,
+# comment the next line and uncomment the following line.  Then replace
+# the CLASSPATH=  with the directory of where Genesis is installed.
+#java GenesisInterpreter $Option "$Files"
+
+t=${GENESISHOME:=/home/morell/genesis/trunk}
+if [ ! -f $GENESISHOME/GenesisInterpreter.class \
+   -a  -f $GENESISHOME/GenesisInterpreter.java \
+   -a  -x $GENESISHOME \
+   ]; then
+   pushd $GENESISHOME > /dev/null
+   echo  Hmm ... Genesis appears to have disappeared. Trying a remake ... 
+   ./rebuild
+   if [ $? -eq 0 ]; then
+      echo "... Successful!"
+   else
+      echo "... Failed!"
+   fi
+   popd > /dev/null
+fi
+if [ ! -f $GENESISHOME/GenesisInterpreter.class ]; then
+   echo <<EOF
+The Genesis Interpreter was not found in $GENESISHOME.
+Please set GENESISHOME to the path where you installed
+the system.  This can be done by defining an environment
+variable, or by editing the setting for GENESISHOME in
+the 'run' file.
+EOF
+   exit
+fi
+#echo Option is $Option
+   CLASSPATH=$GENESISHOME java GenesisInterpreter >/dev/null 2>&1 <<EOF
+EOF
+   status=$? 
+   Recompiling=0
+   if [ $status != 0 ]; then # The interpreter failed, try recompiling
+      Recompiling=1
+      echo "It appears that the interpreter for Java on this system is out of date since it returned a value of $status.  Trying a recompile of Genesis:" 
+      pushd $GENESISHOME > /dev/null
+      make > /dev/null
+      CLASSPATH=$GENESISHOME java GenesisInterpreter >/dev/null 2>&1 <<EOF
+EOF
+      status=$? 
+      if [ $status != 0 ]; then
+         echo Recompiling Genesis did no good ... please contact your instructor.
+         exit
+      else
+         popd > /dev/null
+         echo Recompiling seems to have worked.  Running your algorithm:'<br />'  
+      fi
+   fi
+   CLASSPATH=$GENESISHOME java GenesisInterpreter $Option $Files
+exit $?

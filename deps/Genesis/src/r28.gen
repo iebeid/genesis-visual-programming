@@ -1,0 +1,212 @@
+// Check iter parameter passing mechanism
+
+Let M(iter n) name procedure {
+   Print is (n) an iterator?
+   Print n
+   Move (N)
+}
+Set precision(0)
+Print "1. Should print:
+true 
+4
+true
+5
+true
+6
+false"
+Print "----------------------"
+Let a name < 4 5 6 >
+Let y name iterator(a[1])
+M(y);
+M(y);
+M(y);
+Print on(y)
+Print "======================"
+
+
+// Check passing through two procedures
+
+Let M1 (iter a) name procedure {
+   M(a);
+}
+unalias y
+Print "2. Should print:
+true 
+4
+true
+5
+true
+6
+false"
+Print "----------------------"
+Let a name < 4 5 6 >
+Let y name iterator(a[1])
+M(y);
+M(y);
+M(y);
+Print on(y)
+Print "======================"
+
+
+// Check modifying the passed parameter
+
+Let M2 (iter a) name procedure {
+   Let a name a + 1
+}
+unalias y
+Print "4. Should print:
+true
+5
+true
+6
+true 
+7
+false
+<5 6 7>"
+Print "----------------------"
+Let a name < 4 5 6 >
+Let y name iterator(a[1])
+M2(y); M(y)
+M2(y); M(y)
+M2(y); M(y)
+Print on(y)
+Print a
+
+
+// Ensure that the original list is modified
+Print "======================"
+Let M3 (iter a) name procedure {
+   Let a name a + 1
+}
+unalias y
+Print "5. Should print:
+true
+5
+true
+6
+true 
+7
+false"
+Print "----------------------"
+Let a name < 4 5 6 >
+Let y name iterator(a[1])
+M3(y);  Print on(y) Print y; Move(y) 
+M3(y);  Print on(y) Print y; Move(y)
+M3(y);  Print on(y) Print y; Move(y)
+Print on(y)
+Print "======================"
+
+// Let's see now if we can swap iterators
+
+Let Swap iterators (iter a) and (iter b) name procedure {
+   Move (t) to (a)
+   Move (a) to (b)
+   Move (b) to (t)
+}
+
+Print '6. Should print
+b e
+2 5
+e b
+5 2
+e b
+<"a" "b" "c" "d" "e" "f">
+b10 e12
+<"a" "b12" "c" "d" "e10" "f">
+'
+Print "----------------------"
+
+Let a name <'a' 'b' 'c' 'd' 'e' 'f'>
+Let i1 name iterator(a[2])
+Let i2 name iterator(a[5])
+Print i1 i2
+Print position of(i1) position of(i2)
+Swap iterators (i1) and (i2)
+
+Print i1 i2
+Print position of(i1) position of(i2)
+Print a
+Let i1 name i1 + 10
+Let i2 name i2 + 12
+Print i1 i2
+Print a
+Print "======================"
+
+
+// Check to see if subscripting works for iteration
+
+Print '7. Should print
+< [1 2 3] [4 5 6] [7 8 9] [10 11 12] >
+<7 8 9>
+<8 9 10>
+'
+Print "----------------------"
+Let a name 
+<
+  < [10 2 3] [4 5 6] [7 8 9] [10 11 12] >
+  < [1 2 3] [4 5 6] [7 8 9] [10 11 12] >
+  < [10 2 3] [4 5 6] [7 8 9] [10 11 12] >
+  < [10 2 3] [4 5 6] [7 8 9] [10 11 12] >
+  < [10 2 3] [4 5 6] [7 8 9] [10 11 12] >
+>
+Generate each(n) from a[2]
+[+] 
+   @f: Let ans name <>
+   @i: Append n onto ans
+   @l: Print ans
+
+
+Generate each(n) from a[2][3]
+[+] 
+   @f: Let ans name <>
+   @i: Append n onto ans
+   @l: Print ans
+
+Generate each(n) from a[2][3]
+[+] 
+   @i: Let n name n + 1
+Print a[2][3]
+
+
+Print "======================"
+
+Print '8. Should print
+1 2 3 4 5
+'
+Print "----------------------"
+While (x <=5)
+[+]
+   @f: Let x name 1
+   @i: { Echo x " "; Let x name x + 1}
+   @l: Print ""
+
+Print "======================"
+Print '9. Should print
+1 2 3 4 5
+'
+Print "----------------------"
+Until (x > 5)
+[+]
+   @f: Let x name 1
+   @i: { Echo x " "; Let x name x + 1}
+   @l: Print ""
+
+Print "======================"
+
+# Check the use of prev and value
+Print '10. Should print
+<<2 9> <4 12> <6 15> >
+'
+Print "----------------------"
+Let L name <1 2 3 4 5>
+Generate each(n) from L
+[+]
+   @f: Let ans name <>
+   @i: Select
+          not atfirst(n) and not atlast(n) -> Append <(2*value(prev(n))), (3*value(next(n)))> onto ans
+Print ans
+Print "======================"
+
+#Print "----------------------"
+#Print "======================"
+
