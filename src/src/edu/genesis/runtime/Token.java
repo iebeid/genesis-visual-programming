@@ -30,6 +30,8 @@ package edu.genesis.runtime;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Token {
 
@@ -79,12 +81,20 @@ public class Token {
     // public int tokenCharPos;
     static int bufferPos = 0;  // location within the buffer
     static SourcePgm sourcePgm = null;
+    PrintStream o;
     // 6/9/04
     // Wes Potts
     //
     //public Token (String filename)   {
 
     public Token(String fn) {
+                                        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         val = "";
         ch = ' ';
         tokenType = Parser.numberSym;
@@ -93,6 +103,13 @@ public class Token {
     }
 
     public Token(Token t) {
+                                        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         val = t.val;
         ch = Token.ch;
         tokenType = t.tokenType;

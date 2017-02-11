@@ -13,11 +13,17 @@
 // 3/8/07   ljm: Modified output format to move the "------------"
 package edu.genesis.runtime;
 
-import edu.genesis.view.GenesisDevelopmentEnvironmentViewController;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewController {
+public class GenesisInterpreter {
 
     public Parser p;
     public Evaluator e;
@@ -25,17 +31,33 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
     Scope s;
     public static Scanner scanner;
     public static TreeNode tn; // root of the whole AST
+    
+    static PrintStream o;
 
     public GenesisInterpreter(String infile, String outfile) {
         p = new Parser(infile);
         e = new Evaluator();
         ax = new EvaluatorXML();
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public void setSource(String filename) {
         p.setSource(filename);
     }
     public static void callGenesis(String args[]) {
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisInterpreter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         int filevar = 0;
         boolean header = true;
         while (filevar < args.length && args[filevar].charAt(0) == '-') { // commandline argument
@@ -54,11 +76,11 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                     version = 1;
                 }
                 System.out.println("Genesis version " + version + "." + revision);
-                outputArea.appendText("Genesis version " + version + "." + revision + "\n");
+                System.out.println("Genesis version " + version + "." + revision + "\n");
                 System.exit(0);
             } else {
                 System.out.println("Unknown commandline option:" + args[0] + "... skipping");
-                outputArea.appendText("Unknown commandline option:" + args[0] + "... skipping\n");
+                System.out.println("Unknown commandline option:" + args[0] + "... skipping\n");
             }
         }
         GenesisInterpreter interpreter = null;
@@ -74,19 +96,19 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
         if (header) {
             System.out.println("Following algorithm\n"
                     + "--------------------");
-            outputArea.appendText("Following algorithm\n"
+            System.out.println("Following algorithm\n"
                     + "--------------------\n");
         }
         if (Evaluator.trace) {
             tn.numberTree();
             System.out.println(tn.toString());
-            outputArea.appendText(tn.toString());
+            System.out.println(tn.toString());
             System.out.println("Enter line numbers where you would like the interpreter to pause.\n");
-            outputArea.appendText("Enter line numbers where you would like the interpreter to pause.\n");
+            System.out.println("Enter line numbers where you would like the interpreter to pause.\n");
             System.out.println("Typing no numbers implies you want to stop after every statement.\n");
-            outputArea.appendText("Typing no numbers implies you want to stop after every statement.\n");
+            System.out.println("Typing no numbers implies you want to stop after every statement.\n");
             System.out.println("Terminate list with eof (^D or ^Z).\n");
-            outputArea.appendText("Terminate list with eof (^D or ^Z).\n");
+            System.out.println("Terminate list with eof (^D or ^Z).\n");
             boolean tryAgain;
             scanner = new Scanner(System.in);
             boolean moreInput = true;
@@ -102,7 +124,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                         }
                     } catch (InputMismatchException ime) {
                         System.out.println("Input must be a number; try again: ");
-                        outputArea.appendText("Input must be a number; try again: \n");
+                        System.out.println("Input must be a number; try again: \n");
                         scanner.nextLine();
                         tryAgain = true;
                     } catch (Exception ie) {
@@ -127,7 +149,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                     + "> or\n"
                     + ">    run +v   // on a Windows system\n"
                     + "\n>\n> Thanks!");
-            outputArea.appendText("Your algorithm is incorrect in some unknown way.\n"
+            System.out.println("Your algorithm is incorrect in some unknown way.\n"
                     + "> If you have the time, please mail a copy of your algorithm to:\n"
                     + ">\n>      morell@cs.atu.edu\n\n"
                     + "> Include in your mail the version of Genesis you are running.\n"
@@ -140,7 +162,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
         if (header) {
             System.out.println("--------------------"
                     + "\nDone following algorithm");
-            outputArea.appendText("--------------------"
+            System.out.println("--------------------"
                     + "\nDone following algorithm\n");
         }
     }
@@ -165,10 +187,10 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                     revision = revision - 99;
                     version = 1;
                 }
-                outputArea.appendText("Genesis version " + version + "." + revision + "\n");
+                System.out.println("Genesis version " + version + "." + revision + "\n");
                 System.exit(0);
             } else {
-                outputArea.appendText("Unknown commandline option:" + args[0] + "... skipping\n");
+                System.out.println("Unknown commandline option:" + args[0] + "... skipping\n");
             }
         }
         GenesisInterpreter interpreter = null;
@@ -182,15 +204,15 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
         }
         tn = interpreter.p.parse();
         if (header) {
-            outputArea.appendText("Following algorithm\n"
+            System.out.println("Following algorithm\n"
                     + "--------------------\n");
         }
         if (EvaluatorXML.trace) {
             tn.numberTree();
-            outputArea.appendText(tn.toString() + "\n");
-            outputArea.appendText("Enter line numbers where you would like the interpreter to pause.\n");
-            outputArea.appendText("Typing no numbers implies you want to stop after every statement.\n");
-            outputArea.appendText("Terminate list with eof (^D or ^Z).\n");
+            System.out.println(tn.toString() + "\n");
+            System.out.println("Enter line numbers where you would like the interpreter to pause.\n");
+            System.out.println("Typing no numbers implies you want to stop after every statement.\n");
+            System.out.println("Terminate list with eof (^D or ^Z).\n");
             boolean tryAgain;
             scanner = new Scanner(System.in);
             boolean moreInput = true;
@@ -205,7 +227,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                             empty = false;
                         }
                     } catch (InputMismatchException ime) {
-                        outputArea.appendText("Input must be a number; try again: \n");
+                        System.out.println("Input must be a number; try again: \n");
                         scanner.nextLine();
                         tryAgain = true;
                     } catch (Exception ie) {
@@ -231,7 +253,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                     + "> or\n"
                     + ">    run +v   // on a Windows system\n"
                     + "\n>\n> Thanks!");
-            outputArea.appendText("Your algorithm is incorrect in some unknown way.\n"
+            System.out.println("Your algorithm is incorrect in some unknown way.\n"
                     + "> If you have the time, please mail a copy of your algorithm to:\n"
                     + ">\n>      morell@cs.atu.edu\n\n"
                     + "> Include in your mail the version of Genesis you are running.\n"
@@ -242,7 +264,7 @@ public class GenesisInterpreter extends GenesisDevelopmentEnvironmentViewControl
                     + "\n>\n> Thanks!\n");
         }
         if (header) {
-            outputArea.appendText("--------------------"
+            System.out.println("--------------------"
                     + "\nDone following algorithm\n");
         }
     }

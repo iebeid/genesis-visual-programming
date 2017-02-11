@@ -16,43 +16,97 @@
  */
 package edu.genesis.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class StickyNote {
 
     GenesisVal val;
     GenesisVal label;
+    PrintStream o;
 
     StickyNote() {
         val = null;
         label = null;
+                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
+
     }
 
     StickyNote(StickyNote d) {
         ///
         val = d.val;
         label = d.label;
+                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
+
     }
 
     StickyNote(GenesisVal v) {
         val = v;
         label = null;
+                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
+
     }
 
     StickyNote(String s) {
         val = new StringVal(s);
         label = null;
+                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
+
     }
 
     StickyNote(double d) {
         val = new DoubleVal(d);
         label = null;
+                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
+
     }
 
     StickyNote(boolean b) {
         val = new TruthVal(b);
         label = null;
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StickyNote.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     GenesisVal getVal() {
@@ -108,13 +162,30 @@ class StickyNote {
 } // end of class StickyNote
 
 abstract class GenesisVal {
+    
 
     public void printBadComparison(GenesisVal v1, GenesisVal v2) {
+        PrintStream o = null;
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         System.err.println("Cannot compare " + v1 + " with " + v2);
         System.exit(1);
     }
 
     public void checkBadComparison(GenesisVal v1, GenesisVal v2) {
+                PrintStream o = null;
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         if (v1.getClass() != v2.getClass()) {
             System.err.print("Cannot compare '" + v1 + "' with ");
             if (v2 instanceof Node) {
@@ -264,6 +335,14 @@ class StringVal extends GV {
 
     @Override
     public GV add(GV rhs) {
+                PrintStream o = null;
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         if (rhs instanceof DoubleVal) {
             return new StringVal(val + rhs);
         } else if (rhs instanceof StringVal) {
@@ -988,6 +1067,14 @@ class TruthVal extends GV {
 
     @Override
     public GV add(GV rhs) {
+                PrintStream o = null;
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         System.err.println("Warning: cannot add " + this + " and " + rhs);
         System.exit(1);
         return (new IntVal(0));

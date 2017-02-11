@@ -17,11 +17,18 @@
  */
 package edu.genesis.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 class Node extends GV {
 
     public StickyNote info;
     public Node left;
     public Node right;
+    PrintStream o;
 //    public StickyNote label;  // Changed by LJM to record label
 
     // Constructors
@@ -30,6 +37,14 @@ class Node extends GV {
         left = null;
         right = null;
         //label = null;                    //added by chad for record label
+        
+                try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(StickyNote tok, Node p, Node n) {
@@ -37,6 +52,13 @@ class Node extends GV {
         left = p;
         right = n;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(double d) {
@@ -44,6 +66,13 @@ class Node extends GV {
         left = null;
         right = null;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(double d, Node p, Node n) {
@@ -51,6 +80,13 @@ class Node extends GV {
         left = p;
         right = n;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(String s, Node p, Node n) {
@@ -58,6 +94,13 @@ class Node extends GV {
         left = p;
         right = n;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(StickyNote tok) {
@@ -65,6 +108,13 @@ class Node extends GV {
         left = null;
         right = null;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(Node n) {
@@ -72,6 +122,13 @@ class Node extends GV {
         left = n.left;
         right = n.right;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(String s) {
@@ -79,6 +136,13 @@ class Node extends GV {
         left = null;
         right = null;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(OpVal ov) {
@@ -86,6 +150,13 @@ class Node extends GV {
         left = null;
         right = null;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node(OpVal ov, Node l, Node r) {
@@ -93,6 +164,13 @@ class Node extends GV {
         left = l;
         right = r;
         //label = null;                    //added by chad for record label
+                        try {
+            o = new PrintStream(new File("A.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Node next() {

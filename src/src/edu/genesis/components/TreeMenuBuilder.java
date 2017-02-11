@@ -21,25 +21,28 @@ import javafx.scene.control.TreeItem;
 public class TreeMenuBuilder extends GenesisDevelopmentEnvironmentViewController {
 
     public TreeMenuBuilder() {
-        GuideConfig initGuide = new GuideConfig("src/edu/genesis/files/guide.cfg");
-        Map map = initGuide.getMap();
-        Iterator it = map.values().iterator();
-        final TreeItem<ProgrammingElement> treeRoot;
-        treeRoot = new TreeItem<>();
-        controls.setEditable(true);
-
-        while (it.hasNext()) {
-            ProgrammingElement pe = (ProgrammingElement) it.next();
-            if(!pe.getLabel().startsWith("t")){
-                if(!pe.getLabel().startsWith("g")){
-                    treeRoot.getChildren().addAll(Arrays.asList(createNode(pe)));
-                }
-            }
-        }
-        
-        controls.setShowRoot(true);
-        controls.setRoot(treeRoot);
-        treeRoot.setExpanded(true);
+//        GuideConfig initGuide = new GuideConfig("src/edu/genesis/files/guide.cfg");
+//        //GuideConfig initGuide = new GuideConfig("D:\\Projects\\ArkansasTechUniversity\\Thesis\\Sources\\GithubProjects\\genesis-visual-programming\\src\\src\\edu\\genesis\\files");
+//        Map map = initGuide.getMap();
+//        Iterator it = map.values().iterator();
+//        final TreeItem<ProgrammingElement> treeRoot;
+//        treeRoot = new TreeItem<>();
+//        
+//        //controls.setEditable(true);
+//
+//        while (it.hasNext()) {
+//            ProgrammingElement pe = (ProgrammingElement) it.next();
+//            if(!pe.getLabel().startsWith("t")){
+//                if(!pe.getLabel().startsWith("g")){
+//                    treeRoot.getChildren().addAll(Arrays.asList(createNode(pe)));
+//                }
+//            }
+//        }
+//        
+//        controls.setEditable(true);
+//        controls.setShowRoot(true);
+//        controls.setRoot(treeRoot);
+//        treeRoot.setExpanded(true);
     }
 
     private TreeItem<ProgrammingElement> createNode(final ProgrammingElement pe) {

@@ -22,7 +22,7 @@ import javafx.scene.image.ImageView;
  */
 public class ProjectTreeViewBuilder extends GenesisDevelopmentEnvironmentViewController {
     public ProjectTreeViewBuilder() {
-        String hostName = "Ebeid-PC";
+        String hostName = "AKEF-PC";
         try {
             hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException x) {
@@ -33,8 +33,8 @@ public class ProjectTreeViewBuilder extends GenesisDevelopmentEnvironmentViewCon
             FilePathTreeItem treeNode = new FilePathTreeItem(name);
             treeRoot.getChildren().add(treeNode);
         }
-        project.setRoot(treeRoot);
-        project.setShowRoot(true);
+        //project.setRoot(treeRoot);
+        //project.setShowRoot(true);
         treeRoot.setExpanded(true);
     }
 }

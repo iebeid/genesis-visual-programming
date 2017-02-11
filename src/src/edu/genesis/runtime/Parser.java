@@ -57,10 +57,17 @@
  */
 package edu.genesis.runtime;
 
-import edu.genesis.view.GenesisDevelopmentEnvironmentViewController;
-import java.util.Hashtable;
 
-public class Parser extends GenesisDevelopmentEnvironmentViewController {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Parser {
 
     public static boolean debug = false;
     public static String tokenStr[] = new String[100];
@@ -145,8 +152,10 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     // 6/09/04 - Wes Potts
     // added a String member to hold the genesis source filename
     private static String sourcefile;
+    
+    PrintStream o;
 
-    public static void init() {
+    public void init() {
         /* Set up built-in functions */
         symtab.put("integer", "function");
         symtab.put("integer()", "function");
@@ -313,6 +322,15 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tokenStr[untilSym] = "keyword 'until'";
         tokenStr[whenSym] = "keyword 'when'";
         tokenStr[iteratorSym] = "keyword 'iterator'";
+        
+        
+                        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
 // 6/9/04
@@ -373,7 +391,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             for (int i = 0; i < indent; i++) {
                 System.err.print(' ');
             }
-            outputArea.appendText(rootinfo(tn));
+            System.out.println(rootinfo(tn));
             indent++;
             traverse2((TreeNode) tn.left);
             traverse2((TreeNode) tn.right);
@@ -385,21 +403,21 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     static void traverse(TreeNode tn) {
         if (tn != null) {
             for (int i = 0; i < indent; i++) {
-                outputArea.appendText(" \n");
+                System.out.println(" \n");
             }
             if (tn.left == null) { // leaf node
                 if (tn.info.getVal() instanceof OpVal) { // bizarre error omitting this brace and its matching
                     OpVal ov = (OpVal) tn.info.getVal();
                     if (ov.eq(OpVal.stmtListOp)) {
-                        outputArea.appendText(rootinfo(tn) + "\n");
+                        System.out.println(rootinfo(tn) + "\n");
                     } else {
-                        outputArea.appendText(sinfo(tn) + "\n");
+                        System.out.println(sinfo(tn) + "\n");
                     }
                 } else {
-                    outputArea.appendText(sinfo(tn) + "\n");
+                    System.out.println(sinfo(tn) + "\n");
                 }
             } else {
-                outputArea.appendText(rootinfo(tn) + "\n");
+                System.out.println(rootinfo(tn) + "\n");
             }
             indent = indent + 3;
             TreeNode tree = (TreeNode) tn.left;
@@ -447,37 +465,37 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     }
 
     void error(int s[]) {
-        outputArea.appendText("\n");
-        outputArea.appendText("\n");
-        outputArea.appendText("\n");
-        outputArea.appendText("*************     ERROR     *************** \n");
-        outputArea.appendText("Error in file " + t.fileName()
+        System.out.println("\n");
+        System.out.println("\n");
+        System.out.println("\n");
+        System.out.println("*************     ERROR     *************** \n");
+        System.out.println("Error in file " + t.fileName()
                 + " at line " + t.lineNo() + ", character " + t.charPos() + "\n");
-        outputArea.appendText("Looking for any of the following: \n");
+        System.out.println("Looking for any of the following: \n");
         int i;
         for (i = 0; i < s.length; i++) {
-            outputArea.appendText("   " + tokenStr[s[i]] + "\n");
+            System.out.println("   " + tokenStr[s[i]] + "\n");
         }
-        outputArea.appendText("\nFound: " + tokenStr[t.tokenType] + "\n");
-        outputArea.appendText("*******************************************\n");
-        outputArea.appendText("Algorithm terminated!\n");
-        outputArea.appendText("\n");
-        outputArea.appendText(Quote.getMessage() + "\n");
+        System.out.println("\nFound: " + tokenStr[t.tokenType] + "\n");
+        System.out.println("*******************************************\n");
+        System.out.println("Algorithm terminated!\n");
+        System.out.println("\n");
+        System.out.println(Quote.getMessage() + "\n");
         System.exit(1);
     }
 
     void printError(String msg) {
-        outputArea.appendText("\n");
-        outputArea.appendText("\n");
-        outputArea.appendText("\n");
-        outputArea.appendText("*************     ERROR     ***************\n");
-        outputArea.appendText("Error in file " + t.fileName()
+        System.out.println("\n");
+        System.out.println("\n");
+        System.out.println("\n");
+        System.out.println("*************     ERROR     ***************\n");
+        System.out.println("Error in file " + t.fileName()
                 + " at line " + t.lineNo() + ", character " + t.charPos() + "\n");
-        outputArea.appendText(msg + "\n");
-        outputArea.appendText("*******************************************\n");
-        outputArea.appendText("Algorithm terminated! \n");
-        outputArea.appendText("\n");
-        outputArea.appendText(Quote.getMessage() + "\n");
+        System.out.println(msg + "\n");
+        System.out.println("*******************************************\n");
+        System.out.println("Algorithm terminated! \n");
+        System.out.println("\n");
+        System.out.println(Quote.getMessage() + "\n");
         System.exit(1);
     }
 // verify -- if current token (tree) is in in the set TokenTypeSet s, 
@@ -501,20 +519,20 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         if (check(s)) {
             t.get();
         } else {
-            outputArea.appendText("\n");
-            outputArea.appendText("\n");
-            outputArea.appendText("\n");
-            outputArea.appendText("************     ERROR     ************** \n");
-            outputArea.appendText("Error in file " + t.fileName()
+            System.out.println("\n");
+            System.out.println("\n");
+            System.out.println("\n");
+            System.out.println("************     ERROR     ************** \n");
+            System.out.println("Error in file " + t.fileName()
                     + " at line " + t.lineNo() + ", character " + t.charPos() + "\n");
-            outputArea.appendText("Looking for the following: \n");
+            System.out.println("Looking for the following: \n");
             int i;
-            outputArea.appendText("   " + tokenStr[s] + "\n"); //+ ":" + s);
-            outputArea.appendText("\nFound: " + tokenStr[t.tokenType] + "\n");
+            System.out.println("   " + tokenStr[s] + "\n"); //+ ":" + s);
+            System.out.println("\nFound: " + tokenStr[t.tokenType] + "\n");
 
-            outputArea.appendText("***************************************** \n");
-            outputArea.appendText("Algorithm terminated! \n");
-            outputArea.appendText("\n");
+            System.out.println("***************************************** \n");
+            System.out.println("Algorithm terminated! \n");
+            System.out.println("\n");
             System.exit(1);
         }
 
@@ -657,14 +675,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          *************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseProgram \n");
+            System.out.println("Entering parseProgram \n");
         }
         TreeNode tn = parseStmtList();
         // edited by Wes Potts 6/14/04
         // the traverse() is not part of the if (debug) and I'm guessing
         // it should be
         if (debug) {
-            outputArea.appendText("Leaving parseProgram \n");
+            System.out.println("Leaving parseProgram \n");
             traverse(tn);
         }
         if (check(eofSym)) {
@@ -685,7 +703,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * ... *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseStmtList \n");
+            System.out.println("Entering parseStmtList \n");
         }
         TreeNode root = new TreeNode(OpVal.stmtListOp);
         TreeNode tn = parseStmt();
@@ -720,7 +738,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         root.left = tn;
         if (debug) {
-            outputArea.appendText("Leaving parseStmtList \n");
+            System.out.println("Leaving parseStmtList \n");
             traverse(tn);
         }
         return root;
@@ -735,7 +753,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseStmt \n");
+            System.out.println("Entering parseStmt \n");
         }
         TreeNode tn = null;   /// PERHAPS TreeNode(nullStmt)
         if (check(letSym)) {
@@ -781,7 +799,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
 
         if (debug) {
-            outputArea.appendText("Leaving parseStmt");
+            System.out.println("Leaving parseStmt");
             traverse(tn);
         }
         return tn;
@@ -795,13 +813,13 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * Builds: StmtList ********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseBlock \n");
+            System.out.println("Entering parseBlock \n");
         }
         verify(lbraceSym);
         TreeNode tn = parseStmtList();
         verify(rbraceSym);
         if (debug) {
-            outputArea.appendText("Leaving parseBlock \n");
+            System.out.println("Leaving parseBlock \n");
             traverse(tn);
         }
         return tn;
@@ -815,13 +833,13 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * Builds: StmtList ********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseTask \n");
+            System.out.println("Entering parseTask \n");
         }
         verify(lbraceSym);
         TreeNode tn = parseTask();
         verify(rbraceSym);
         if (debug) {
-            outputArea.appendText("Leaving parseTask \n");
+            System.out.println("Leaving parseTask \n");
             traverse(tn);
         }
         return tn;
@@ -862,7 +880,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseLetStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseLetStmt \n");
+            System.out.println("Entering parseLetStmt \n");
         }
         TreeNode tn = null;  // Bad form
         verify(letSym);
@@ -956,7 +974,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                             //String mangledName = mangle(tn);
                             //symtab.put(mangledName, "function"); 
                             if (debug) {
-                                outputArea.appendText("Entering: " + mangledName + " as "
+                                System.out.println("Entering: " + mangledName + " as "
                                         + (String) symtab.get(mangledName) + "\n");
                             }
                             //System.out.println("Function:'" +mangledName + "' entered into symtab");
@@ -970,7 +988,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         // tn = new TreeNode(OpVal.procedureDefOp,tn, null);  
                         tn = temp;
                         if (debug) {
-                            outputArea.appendText("Entering: " + mangledName + " as "
+                            System.out.println("Entering: " + mangledName + " as "
                                     + (String) symtab.get(mangledName) + "\n");
                         }
                     } else if (check(taskSym)) {
@@ -991,7 +1009,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         // things simple
                         tn = temp;
                         if (debug) {
-                            outputArea.appendText("Entering: " + mangledName + " as "
+                            System.out.println("Entering: " + mangledName + " as "
                                     + (String) symtab.get(mangledName) + "\n");
                         }
                     }
@@ -1003,7 +1021,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             error(new int[]{idSym, lparenSym});
         }
         if (debug) {
-            outputArea.appendText("Leaving parseLetStmt \n");
+            System.out.println("Leaving parseLetStmt \n");
             TreeNode d = new TreeNode(OpVal.debugOp, tn, null);
             traverse(d);
         }
@@ -1017,7 +1035,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parsePrintStmt \n");
+            System.out.println("Entering parsePrintStmt \n");
         }
         TreeNode tn = null;
 
@@ -1027,7 +1045,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = parsePrintExpressionList();
         tn = new TreeNode(OpVal.printOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parsePrintStmt \n");
+            System.out.println("Leaving parsePrintStmt \n");
             traverse(tn);
         }
         tn.context = context;
@@ -1042,7 +1060,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parsePrintStmt \n");
+            System.out.println("Entering parsePrintStmt \n");
         }
         TreeNode tn = null;
 
@@ -1050,7 +1068,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = parsePrintExpressionList();
         tn = new TreeNode(OpVal.echoStmtOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseEchoStmt \n");
+            System.out.println("Leaving parseEchoStmt \n");
             traverse(tn);
         }
         return tn;
@@ -1063,7 +1081,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * : OpVal.procedureCallOp Id ExpressionList ************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseProcedureOrGeneratorCall \n");
+            System.out.println("Entering parseProcedureOrGeneratorCall \n");
         }
         if (check(callSym)) {
             verify(callSym); // toss away ... just punctuation
@@ -1106,15 +1124,15 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn = new TreeNode(OpVal.pipeOp, tn, null);
         }
         if (debug) {
-            outputArea.appendText("Leaving parseIterationStmt \n");
+            System.out.println("Leaving parseIterationStmt \n");
             traverse(tn);
         }
         if (debug) {
-            outputArea.appendText("Leaving parseProcedureCall \n");
+            System.out.println("Leaving parseProcedureCall \n");
             traverse(tn);
         }
         if (debug) {
-            outputArea.appendText("ppc: \n");
+            System.out.println("ppc: \n");
             traverse(tn);
         }
         return tn;
@@ -1128,7 +1146,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseIterationStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseIterationStmt \n");
+            System.out.println("Entering parseIterationStmt \n");
         }
         TreeNode tn = parseGenerateStmt();
         if (check(pipeSym)) {
@@ -1144,7 +1162,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         tn = new TreeNode(OpVal.pipeOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseIterationStmt \n");
+            System.out.println("Leaving parseIterationStmt \n");
             traverse(tn);
         }
         return tn;
@@ -1157,7 +1175,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parsePipeline() {
         if (debug) {
-            outputArea.appendText("Entering parsePipeline \n");
+            System.out.println("Entering parsePipeline \n");
         }
         TreeNode tn;
         tn = parseGuardedTask();
@@ -1167,7 +1185,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
 
         if (debug) {
-            outputArea.appendText("Leaving parsePipeline \n");
+            System.out.println("Leaving parsePipeline \n");
             traverse(tn);
         }
         return tn;
@@ -1182,7 +1200,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseGuardedTask() {
         if (debug) {
-            outputArea.appendText("Entering parseGuardedTask \n");
+            System.out.println("Entering parseGuardedTask \n");
         }
         TreeNode tn;
 
@@ -1197,7 +1215,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn.right = new TreeNode(OpVal.taskOp, temp, null);
         tn = new TreeNode(OpVal.guardedTaskOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseGuardedTask \n");
+            System.out.println("Leaving parseGuardedTask \n");
             traverse(tn);
         }
         return tn;
@@ -1216,7 +1234,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseTask() {
         if (debug) {
-            outputArea.appendText("Entering parseTask");
+            System.out.println("Entering parseTask");
         }
         TreeNode tn;
         if (check(new int[]{atbeginSym, ateachSym, atendSym})) { // complex case
@@ -1255,7 +1273,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         //tn = new TreeNode (OpVal.taskOp,tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseTask");
+            System.out.println("Leaving parseTask");
             traverse(tn);
         }
         return tn;
@@ -1269,14 +1287,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseWhile() {
         if (debug) {
-            outputArea.appendText("Entering parseWhile");
+            System.out.println("Entering parseWhile");
         }
         TreeNode tn;
         verify(whileSym);
         tn = parseExpression(true);
         tn = new TreeNode(OpVal.whileOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseWhile");
+            System.out.println("Leaving parseWhile");
             traverse(tn);
         }
         return tn;
@@ -1290,7 +1308,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseUntil() {
         if (debug) {
-            outputArea.appendText("Entering parseUntil");
+            System.out.println("Entering parseUntil");
         }
         TreeNode tn;
         verify(untilSym);
@@ -1298,7 +1316,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = new TreeNode(OpVal.notOp, tn, null);
         tn = new TreeNode(OpVal.whileOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseUntil");
+            System.out.println("Leaving parseUntil");
             traverse(tn);
         }
         return tn;
@@ -1306,14 +1324,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parseWhileStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseWhile");
+            System.out.println("Entering parseWhile");
         }
         TreeNode tn;
         verify(whileSym);
         tn = parseExpression(true);
         tn = new TreeNode(OpVal.whileOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseWhile");
+            System.out.println("Leaving parseWhile");
             traverse(tn);
         }
         if (check(pipeSym)) {
@@ -1325,7 +1343,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parseUntilStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseWhile");
+            System.out.println("Entering parseWhile");
         }
         TreeNode tn;
         verify(untilSym);
@@ -1333,7 +1351,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = new TreeNode(OpVal.notOp, tn, null);
         tn = new TreeNode(OpVal.whileOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseWhile");
+            System.out.println("Leaving parseWhile");
             traverse(tn);
         }
         if (check(pipeSym)) {
@@ -1353,7 +1371,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseSource() {
         if (debug) {
-            outputArea.appendText("Entering parseSource");
+            System.out.println("Entering parseSource");
         }
         TreeNode tn;
         if (check(new int[]{ltSym,
@@ -1375,7 +1393,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             verify(idSym);
         }
         if (debug) {
-            outputArea.appendText("Leaving parseSource");
+            System.out.println("Leaving parseSource");
             traverse(tn);
         }
         return tn;
@@ -1388,7 +1406,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseReturnStmt");
+            System.out.println("Entering parseReturnStmt");
         }
         TreeNode tn = null;
 
@@ -1396,7 +1414,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = parseExpression(true);
         tn = new TreeNode(OpVal.returnStmtOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseReturnStmt");
+            System.out.println("Leaving parseReturnStmt");
             traverse(tn);
         }
         return tn;
@@ -1408,7 +1426,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * StopStmt : 'stop' Builds: OpVal.stopOp *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseStopStmt");
+            System.out.println("Entering parseStopStmt");
         }
         TreeNode tn = null;
         Context context = new Context(t);
@@ -1418,7 +1436,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn = new TreeNode(OpVal.stopStmtOp, tn, null);
         tn.context = context;
         if (debug) {
-            outputArea.appendText("Leaving parseStopStmt");
+            System.out.println("Leaving parseStopStmt");
             traverse(tn);
         }
         return tn;
@@ -1433,13 +1451,13 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          */
 //debug=true;
         if (debug) {
-            outputArea.appendText("Entering parseSelectStmt()");
+            System.out.println("Entering parseSelectStmt()");
         }
 
         verify(selectSym);
         TreeNode tn = parseSelectBody();
         if (debug) {
-            outputArea.appendText("Leaving parseSelectStmt()");
+            System.out.println("Leaving parseSelectStmt()");
             traverse(tn);
         }
         return tn;
@@ -1455,7 +1473,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseSelectBody() {
         if (debug) {
-            outputArea.appendText("Entering parseSelectBody()");
+            System.out.println("Entering parseSelectBody()");
         }
         TreeNode tn = null;
         if (check(lbraceSym)) {
@@ -1467,7 +1485,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         tn = new TreeNode(OpVal.selectOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseSelectBody()");
+            System.out.println("Leaving parseSelectBody()");
             traverse(tn);
         }
         return tn;
@@ -1481,7 +1499,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parseSelectList() {
         if (debug) {
-            outputArea.appendText("Entering parseSelectList");
+            System.out.println("Entering parseSelectList");
         }
 
         TreeNode tn;
@@ -1496,7 +1514,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn.right = parseStmt();
             tn = new TreeNode(OpVal.guardedStmtOp, tn, null);
             if (debug) {
-                outputArea.appendText("Leaving parseGuardedStmt");
+                System.out.println("Leaving parseGuardedStmt");
                 traverse(tn);
             }
         } else {
@@ -1536,7 +1554,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         // debug=true;
         if (debug) {
-            outputArea.appendText("Leaving parseSelectList");
+            System.out.println("Leaving parseSelectList");
             traverse(tn);
         }
         return tn;
@@ -1544,14 +1562,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parseGuardedStmt() {
         if (debug) {
-            outputArea.appendText("Entering parseGuardedStmt");
+            System.out.println("Entering parseGuardedStmt");
         }
         TreeNode tn = parseExpression(true);
         verify(arrowSym);
         tn.right = parseStmt();
         tn = new TreeNode(OpVal.guardedStmtOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseGuardedStmt");
+            System.out.println("Leaving parseGuardedStmt");
             traverse(tn);
         }
         return tn;
@@ -1562,7 +1580,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseFile() {
         if (debug) {
-            outputArea.appendText("Entering parseFile");
+            System.out.println("Entering parseFile");
         }
         TreeNode tn;
         verify(fileSym);
@@ -1570,7 +1588,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         verify(new int[]{idSym, stringSym});
         tn = new TreeNode(OpVal.fileOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseFile");
+            System.out.println("Leaving parseFile");
             traverse(tn);
         }
         return tn;
@@ -1584,7 +1602,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseRange() {
         if (debug) {
-            outputArea.appendText("Entering parseRange");
+            System.out.println("Entering parseRange");
         }
         TreeNode tn;
         if (check(firstOfExpression)) {
@@ -1636,7 +1654,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             return tn = null;
         }
         if (debug) {
-            outputArea.appendText("Leaving parseRange");
+            System.out.println("Leaving parseRange");
             traverse(tn);
         }
         return tn;
@@ -1650,7 +1668,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          */
         //    debug=true;
         if (debug) {
-            outputArea.appendText("Entering parseExpressionList");
+            System.out.println("Entering parseExpressionList");
         }
         TreeNode tn = parseExpression(false);
         //System.out.println ("tn="+tn);
@@ -1663,7 +1681,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
 
         if (debug) {
-            outputArea.appendText("Leaving parseExpressionList");
+            System.out.println("Leaving parseExpressionList");
             traverse(tn);
         }
         return tn;
@@ -1676,7 +1694,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * ***************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseExpressionList");
+            System.out.println("Entering parseExpressionList");
         }
         TreeNode tn;
         if (check(rparenSym)) {  // No parameter
@@ -1691,7 +1709,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             }
         }
         if (debug) {
-            outputArea.appendText("Leaving parseExpressionList");
+            System.out.println("Leaving parseExpressionList");
             traverse(tn);
         }
         return tn;
@@ -1704,7 +1722,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * OpVal.condExpOp OpVal.condTermOp ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseExpression");
+            System.out.println("Entering parseExpression");
         }
         TreeNode tn = parseCondTerm(withFunction);
         while (check(orSym)) {
@@ -1713,7 +1731,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn = new TreeNode(OpVal.orOp, tn, null);
         }
         if (debug) {
-            outputArea.appendText("Leaving Expression OpVal.Op with " + tn.info);
+            System.out.println("Leaving Expression OpVal.Op with " + tn.info);
             traverse(tn);
         }
 
@@ -1729,7 +1747,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseCondTerm");
+            System.out.println("Entering parseCondTerm");
         }
         TreeNode tn = parseCondPrimary(withFunction);
         while (check(andSym)) {
@@ -1738,7 +1756,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn = new TreeNode(OpVal.andOp, tn, null);
         }
         if (debug) {
-            outputArea.appendText("Leaving CondTerm OpVal.Op with " + tn.info);
+            System.out.println("Leaving CondTerm OpVal.Op with " + tn.info);
             traverse(tn);
         }
         return tn;
@@ -1753,7 +1771,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * OpVal.ConditionPrimaryOp ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseCondPrimary");
+            System.out.println("Entering parseCondPrimary");
         }
         TreeNode tn = null;
 
@@ -1773,7 +1791,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn = parseCondition(withFunction);
         }
         if (debug) {
-            outputArea.appendText("Leaving CondPrimary OpVal.Op with " + tn.info);
+            System.out.println("Leaving CondPrimary OpVal.Op with " + tn.info);
             traverse(tn);
         }
         return tn;
@@ -1786,7 +1804,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * *************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseCondition");
+            System.out.println("Entering parseCondition");
         }
         TreeNode tn = null;
         Context context = new Context(t);
@@ -1841,7 +1859,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                 tn = e;
             }
             if (debug) {
-                outputArea.appendText("Leaving parseCondition");
+                System.out.println("Leaving parseCondition");
                 traverse(tn);
             }
         }
@@ -1854,13 +1872,13 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * Exp : Exp + Term | Exp - Term | Term ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseArithmeticExpression");
+            System.out.println("Entering parseArithmeticExpression");
         }
         TreeNode tn = parseTerm(withFunction);
         while (check(new int[]{plusSym, minusSym})
                 && !(Token.commaBreak)) {
             if (debug) {
-                outputArea.appendText("Entering parseArithmeticExpression Loop");
+                System.out.println("Entering parseArithmeticExpression Loop");
             }
             if (check(plusSym)) {
                 verify(plusSym);
@@ -1873,7 +1891,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             }
         }
         if (debug) {
-            outputArea.appendText("Leaving ArithmeticExpression OpVal.Op with " + tn.info);
+            System.out.println("Leaving ArithmeticExpression OpVal.Op with " + tn.info);
             traverse(tn);
         }
         return tn;
@@ -1889,12 +1907,12 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * OpVal.modOp OpVal.primaryOp OpVal.primaryOp ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseTerm");
+            System.out.println("Entering parseTerm");
         }
 
         TreeNode tn;
         tn = parsePrimaryOrFunction(withFunction);
-        // outputArea.appendText(tn);
+        // System.out.println(tn);
         while (check(new int[]{starSym, slashSym, percentSym})) {
             if (check(starSym)) {
                 verify(starSym);
@@ -1911,7 +1929,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             }
         }
         if (debug) {
-            outputArea.appendText("Leaving parseTerm OpVal.Op with " + tn.info);
+            System.out.println("Leaving parseTerm OpVal.Op with " + tn.info);
             traverse(tn);
         }
         return tn;
@@ -1919,7 +1937,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parsePrimaryOrFunction(boolean withFunction) {
         if (debug) {
-            outputArea.appendText("Entering parsePrimaryOrFunction");
+            System.out.println("Entering parsePrimaryOrFunction");
         }
         String name = "";
         TreeNode tn;
@@ -1940,7 +1958,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     TreeNode parsePossibleFunctionCall(boolean withFunction, String name) {
         //debug = true;
         if (debug) {
-            outputArea.appendText("Entering parsePossibleFunctionCall with" + name);
+            System.out.println("Entering parsePossibleFunctionCall with" + name);
         }
         // Note that the only way to get here is if the next input is an id or a reserved word
         boolean possibleFunctionCall = false;
@@ -1957,11 +1975,11 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
         String partialname = newname;
         if (debug) {
-            outputArea.appendText("Here1: " + t + "/" + newname + "/" + partialname);
+            System.out.println("Here1: " + t + "/" + newname + "/" + partialname);
         }
         Object obj = symtab.get(newname);
         if (debug) {
-            outputArea.appendText("Here2: " + t + "/" + obj + "/" + partialname);
+            System.out.println("Here2: " + t + "/" + obj + "/" + partialname);
         }
         if (debug) {
             System.out.println("Checking for reserved word or id" + t);
@@ -1971,7 +1989,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             possibleFunctionCall = true;
             verify(reservedWordorId);
             if (debug) {
-                outputArea.appendText("Here3:" + t + "/" + newname + "/" + partialname);
+                System.out.println("Here3:" + t + "/" + newname + "/" + partialname);
             }
             if (check(reservedWordorId)) { // see if this id can be appended
                 String oldnewname = newname;
@@ -1980,11 +1998,11 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                 partialname = partialname + "_" + t.val;
                 obj = symtab.get(newname);
                 if (debug) {
-                    outputArea.appendText("Here4:" + t + "/" + newname + "/" + partialname);
+                    System.out.println("Here4:" + t + "/" + newname + "/" + partialname);
                 }
                 //verify(reservedWordorId);
                 if (debug) {
-                    outputArea.appendText("Here5:" + t + "/" + obj + "/" + name);
+                    System.out.println("Here5:" + t + "/" + obj + "/" + name);
                 }
                 if (obj == null) { // revert back to previous name
                     partialname = oldpartialname;
@@ -1995,7 +2013,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         verify(reservedWordorId);
                         newname = name + "_" + t.val;
                         if (debug) {
-                            outputArea.appendText("Here6" + t + "/" + newname + "/" + partialname);
+                            System.out.println("Here6" + t + "/" + newname + "/" + partialname);
                         }
                         obj = symtab.get(newname);
                         if (obj != null) {
@@ -2004,7 +2022,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                     }
                 }
                 if (debug) {
-                    outputArea.appendText("Here7:" + t + "/" + newname + "/" + partialname);
+                    System.out.println("Here7:" + t + "/" + newname + "/" + partialname);
                 }
 
             }
@@ -2018,14 +2036,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
             newname = name + "()";
             if (debug) {
-                outputArea.appendText("Here8:" + t + "/" + newname + "/" + partialname);
+                System.out.println("Here8:" + t + "/" + newname + "/" + partialname);
             }
             obj = symtab.get(newname);
             if (debug) {
-                outputArea.appendText("Here9:" + t + "/" + obj + "/" + partialname);
+                System.out.println("Here9:" + t + "/" + obj + "/" + partialname);
             }
             if (debug) {
-                outputArea.appendText("Here9.5:" + t + "/" + obj + "/" + partialname);
+                System.out.println("Here9.5:" + t + "/" + obj + "/" + partialname);
             }
             //if (obj == null && realFunctionCall) {  //  function not found, backup to previous
             //n.right = null;
@@ -2038,14 +2056,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                     verify(lparenSym);
                     n.right = new TreeNode(OpVal.parameterOp,
                             parseExpressionList(), null);
-                    // outputArea.appendText("Here4:" + tree.val );
+                    // System.out.println("Here4:" + tree.val );
                     // traverse(n);
                     n = (TreeNode) n.right;
                     Node node = n.left;
                     int count = 0;
                     verify(rparenSym);
                     if (debug) {
-                        outputArea.appendText("Here10:" + n);
+                        System.out.println("Here10:" + n);
                     }
                 } else {
                     while (check(numberSym) || check(stringSym)) {
@@ -2053,7 +2071,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         boolean firsttime = true;
                         if (check(numberSym)) {
                             if (debug) {
-                                outputArea.appendText("Extending routine name " + newname + " with " + t);
+                                System.out.println("Extending routine name " + newname + " with " + t);
                             }
                             name = newname;
                             realFunctionCall = true;  // if it looks like a duck ...
@@ -2073,17 +2091,17 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                                 }
                                 tt.right = nn;
                             }
-                            // outputArea.appendText("Here4:" + tree.val );
+                            // System.out.println("Here4:" + tree.val );
                             // traverse(n);
                             n = (TreeNode) n.right;
                             Node node = n.left;
                             int count = 0;
                             if (debug) {
-                                outputArea.appendText("Here10:" + n);
+                                System.out.println("Here10:" + n);
                             }
                         } else if (check(stringSym)) {
                             if (debug) {
-                                outputArea.appendText("Extending routine name " + newname + " with " + t);
+                                System.out.println("Extending routine name " + newname + " with " + t);
                             }
                             name = newname;
                             realFunctionCall = true;  // if it looks like a duck ...
@@ -2093,14 +2111,14 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                             verify(stringSym);
 
                             n.right = new TreeNode(OpVal.parameterOp, sn, null);
-                            // outputArea.appendText("Here4:" + tree.val );
+                            // System.out.println("Here4:" + tree.val );
                             // traverse(n);
                             n = (TreeNode) n.right;
                             Node node;
                             node = n.left;
                             int count = 0;
                             if (debug) {
-                                outputArea.appendText("Here10:" + n);
+                                System.out.println("Here10:" + n);
                             }
                         }
                     }
@@ -2118,24 +2136,24 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         // Also at this point, n is the tail of the list
         //debug=true; 
         if (debug) {
-            outputArea.appendText("NEWNAME is " + newname);
+            System.out.println("NEWNAME is " + newname);
         }
         if (debug) {
-            outputArea.appendText("NAME is " + name);
+            System.out.println("NAME is " + name);
         }
         if (debug) {
-            outputArea.appendText("possible function call is " + possibleFunctionCall);
+            System.out.println("possible function call is " + possibleFunctionCall);
         }
         if (debug) {
-            outputArea.appendText("real function call is " + realFunctionCall);
+            System.out.println("real function call is " + realFunctionCall);
         }
         if (realFunctionCall) {
             if (debug) {
-                outputArea.appendText("Real function call: NAME is " + name);
+                System.out.println("Real function call: NAME is " + name);
             }
             obj = symtab.get(name);
             if (debug) {
-                outputArea.appendText("Here11: obj= " + (String) obj);
+                System.out.println("Here11: obj= " + (String) obj);
             }
             if (obj == null || "partial".equals((String) obj)) {
                 printError("Error: " + name + " is not a valid function call");
@@ -2144,7 +2162,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                 case "function":
                     tn = new TreeNode(OpVal.functionCallOp, (TreeNode) tn.right(), null);
                     if (debug) {
-                        outputArea.appendText("Here12: tn=");
+                        System.out.println("Here12: tn=");
                     }
                     if (debug) {
                         traverse(tn);
@@ -2160,7 +2178,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         } else { // not a function call ... just a lonely variable
             // awgh or some reserved word!
             if (debug) {
-                outputArea.appendText("Lonely variable: " + name + "/" + t.val + "/" + possibleFunctionCall);
+                System.out.println("Lonely variable: " + name + "/" + t.val + "/" + possibleFunctionCall);
             }
             //tn = new TreeNode (tree.val); verify(idSym);
             if (!possibleFunctionCall) {  // The id was not extended, just a lonely name
@@ -2168,7 +2186,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                     tn = new TreeNode(t.val);
                     verify(idSym);
                 } else if (check(trueSym)) {
-                    // outputArea.appendText ("found true");
+                    // System.out.println ("found true");
                     tn = new TreeNode(OpVal.trueOp);
                     verify(trueSym);
                 } else if (check(falseSym)) {
@@ -2192,7 +2210,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
         }
         if (debug) {
-            outputArea.appendText("Returning " + tn.info + "from parsePossibleFunctionCall");
+            System.out.println("Returning " + tn.info + "from parsePossibleFunctionCall");
         }
         if (debug) {
             traverse2(tn);
@@ -2213,7 +2231,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          */
         //  debug=true;
         if (debug) {
-            outputArea.appendText("Entering parsePrimary");
+            System.out.println("Entering parsePrimary");
         }
         TreeNode tn = null;
         boolean negative = false;
@@ -2287,7 +2305,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn = new TreeNode(OpVal.colonOp, tn, null);
         }
         if (debug) {
-            outputArea.appendText("Leaving Primary OpVal.Op with " + tn.info);
+            System.out.println("Leaving Primary OpVal.Op with " + tn.info);
             traverse(tn);
         }
         // if we didn'tree get an ID or a '('  or ...
@@ -2304,7 +2322,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseList(int matchtype) {
         if (debug) {
-            outputArea.appendText("Entering parseList looking for " + tokenStr[matchtype]);
+            System.out.println("Entering parseList looking for " + tokenStr[matchtype]);
         }
         verify(new int[]{ltSym, lbracketSym});
         TreeNode tn;
@@ -2318,7 +2336,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         verify(new int[]{gtSym, rbracketSym});
 
         if (debug) {
-            outputArea.appendText("Leaving parseList");
+            System.out.println("Leaving parseList");
             traverse(tn);
         }
         return tn;
@@ -2333,7 +2351,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseListSeq(int matchtype) {
         if (debug) {
-            outputArea.appendText("Entering parseListSeq");
+            System.out.println("Entering parseListSeq");
         }
         TreeNode tn = null;
         if (check(matchtype)) {
@@ -2369,7 +2387,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
         tn.right = parseListSeq(matchtype);
         if (debug) {
-            outputArea.appendText("Leaving parseListSeq");
+            System.out.println("Leaving parseListSeq");
             traverse(tn);
         }
         return tn;
@@ -2385,7 +2403,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * ***********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseGenerateStmt");
+            System.out.println("Entering parseGenerateStmt");
         }
         verify(generateSym);
         TreeNode tn = parseGeneratorRef();
@@ -2407,7 +2425,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
         tn = new TreeNode(OpVal.generateStmtOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseGenerateStmt");
+            System.out.println("Leaving parseGenerateStmt");
             traverse(tn);
         }
         return tn;
@@ -2422,7 +2440,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * **************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseGeneratorRef");
+            System.out.println("Entering parseGeneratorRef");
         }
         TreeNode tn = new TreeNode(t.val);
         tn.setContext(t);
@@ -2432,7 +2450,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         verify(rparenSym);
         tn = new TreeNode(OpVal.generatorRefOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseGeneratorRef");
+            System.out.println("Leaving parseGeneratorRef");
             traverse(tn);
         }
         return tn;
@@ -2448,7 +2466,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * Builds: ID ID ID ... *************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseParameterList");
+            System.out.println("Entering parseParameterList");
         }
         TreeNode tn = null;
         if (check(idSym)) {
@@ -2467,7 +2485,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         }
 
         if (debug) {
-            outputArea.appendText("Leaving parseParameterList");
+            System.out.println("Leaving parseParameterList");
             traverse(tn);
         }
         return tn;
@@ -2486,7 +2504,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseIdParmList() {
         if (debug) {
-            outputArea.appendText("Entering parseIdParmList");
+            System.out.println("Entering parseIdParmList");
         }
         TreeNode tn = null;
         tn = parseIdSeq();
@@ -2494,7 +2512,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn.right = parsePIList();
         }
         if (debug) {
-            outputArea.appendText("Leaving parseIdParmList");
+            System.out.println("Leaving parseIdParmList");
             traverse(tn);
         }
         return tn;
@@ -2507,7 +2525,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseIPList() {
         if (debug) {
-            outputArea.appendText("Entering parseIPList");
+            System.out.println("Entering parseIPList");
         }
         TreeNode tn = parseIdSeq();
         if (check(lparenSym)) {
@@ -2518,7 +2536,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn.right.right = parseIPList();
         }
         if (debug) {
-            outputArea.appendText("Leaving parseIPList");
+            System.out.println("Leaving parseIPList");
             TreeNode d = new TreeNode(OpVal.debugOp, tn, null);
             traverse(d);
         }
@@ -2534,7 +2552,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     TreeNode parseParmIdList() {
         // debug=true;
         if (debug) {
-            outputArea.appendText("Entering parseParmIdList");
+            System.out.println("Entering parseParmIdList");
         }
         TreeNode tn = null;
         tn = parseParameter();
@@ -2543,7 +2561,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn.right = parseIPList();
         }
         if (debug) {
-            outputArea.appendText("Leaving parseParmIdList");
+            System.out.println("Leaving parseParmIdList");
             TreeNode d = new TreeNode(OpVal.debugOp, tn, null);
             traverse(d);
         }
@@ -2558,7 +2576,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parsePIList() {
         if (debug) {
-            outputArea.appendText("Entering parsePIList");
+            System.out.println("Entering parsePIList");
         }
         TreeNode tn = parseParameter();
         if (check(reservedWordorId)) //if (check (idSym))
@@ -2570,7 +2588,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             tn.right.right = parsePIList();
         }
         if (debug) {
-            outputArea.appendText("Leaving parsePIList");
+            System.out.println("Leaving parsePIList");
             traverse(tn);
         }
         return tn;
@@ -2586,7 +2604,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     String parseIdString() {
         if (debug) {
-            outputArea.appendText("Entering parseIdString");
+            System.out.println("Entering parseIdString");
         }
         String ans = t.val.toString();  // Get the val whether it be a reserved word or id
 
@@ -2597,21 +2615,21 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             ans = ans + "_" + parseIdString();
         }
         if (debug) {
-            outputArea.appendText("Leaving parseIdString with ");
-//            outputArea.appendText('"' +ans + '"'); 
+            System.out.println("Leaving parseIdString with ");
+//            System.out.println('"' +ans + '"'); 
         }
         return ans;
     }
 
     TreeNode parseIdSeq() {
         if (debug) {
-            outputArea.appendText("Entering parseIdSeq");
+            System.out.println("Entering parseIdSeq");
         }
         String idString = parseIdString();
         TreeNode tn = new TreeNode(idString);
         tn.setContext(t);
         if (debug) {
-            outputArea.appendText("Leaving parseIdSeq");
+            System.out.println("Leaving parseIdSeq");
             traverse(tn);
         }
         return tn;
@@ -2622,7 +2640,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
      */
     TreeNode parseParameter() {
         if (debug) {
-            outputArea.appendText("Entering parseParameter");
+            System.out.println("Entering parseParameter");
         }
         verify(lparenSym);
         TreeNode tn = new TreeNode(t);
@@ -2632,7 +2650,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         verify(rparenSym);
         tn = new TreeNode(OpVal.parameterOp, tn, null);
         if (debug) {
-            outputArea.appendText("Leaving parseParameter");
+            System.out.println("Leaving parseParameter");
             traverse(tn);
         }
         return tn;
@@ -2657,7 +2675,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
     String mangle(TreeNode tn) {
         //debug=true;
         if (debug) {
-            outputArea.appendText("mangling:" + tn);
+            System.out.println("mangling:" + tn);
         }
         Node n = tn;
         if (n != null) {
@@ -2671,7 +2689,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
             //System.out.println("Processing: " +n);
             if (testType(n, new StringVal(""))) {
                 String s = n.info.val.toString();
-                // outputArea.appendText("Processing " + fname);
+                // System.out.println("Processing " + fname);
                 //fname += s;
                 for (i = 0; i < s.length(); i++) {
                     if (s.charAt(i) == '_') {
@@ -2680,7 +2698,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         {
                             symtab.put(fname + s.substring(0, i), "partial");
                         }
-                        // outputArea.appendText( "Found subprog def:" + 
+                        // System.out.println( "Found subprog def:" + 
                         //             fname + s.substring(0,i) + " as " + (String) obj);
                     }
                     if (s.charAt(i) == ')') {
@@ -2689,7 +2707,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                         {
                             symtab.put(fname + s.substring(0, i + 1), "partial");
                         }
-//                 outputArea.appendText( "Found subprog def:" + 
+//                 System.out.println( "Found subprog def:" + 
                         //                             fname  + s.substring(0,i+1)+ " as " + (String) obj);
                     }
 
@@ -2701,7 +2719,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                     symtab.put(fname, "partial");
                 }
 
-//          outputArea.appendText( "Found subprog def:" + 
+//          System.out.println( "Found subprog def:" + 
                 //                             fname + " as " + (String) obj);
                 n = n.right();
             } else if (testType(n, OpVal.parameterOp)
@@ -2713,7 +2731,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
                 {
                     symtab.put(fname, "partial");
                 }
-//          outputArea.appendText( "Found: subprog def:" + 
+//          System.out.println( "Found: subprog def:" + 
                 //fname + " as " + (String) obj);
 
                 n = n.right();
@@ -2732,13 +2750,13 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
 
     TreeNode parseFunctionDef() {
         if (debug) {
-            outputArea.appendText("Entering parseFunctionDef");
+            System.out.println("Entering parseFunctionDef");
         }
         // verify(functionSym); // Moved to the point of call
         TreeNode tn = parseBlock();
         // tn = new TreeNode (OpVal.blockOp,tn,null); // ljm: 07/16/04
         if (debug) {
-            outputArea.appendText("Leaving parseFunctionDef");
+            System.out.println("Leaving parseFunctionDef");
             traverse(tn);
         }
         return tn;
@@ -2754,12 +2772,12 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          ************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseProcedureDef");
+            System.out.println("Entering parseProcedureDef");
         }
         verify(procedureSym);
         TreeNode tn = parseBlock();
         if (debug) {
-            outputArea.appendText("Leaving parseProcedureDef");
+            System.out.println("Leaving parseProcedureDef");
             traverse(tn);
         }
 
@@ -2776,12 +2794,12 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          ************************
          */
         if (debug) {
-            outputArea.appendText("Entering parseProcedureDef");
+            System.out.println("Entering parseProcedureDef");
         }
         verify(generatorSym);
         TreeNode tn = parseBlock();
         if (debug) {
-            outputArea.appendText("Leaving parseProcedureDef");
+            System.out.println("Leaving parseProcedureDef");
             traverse(tn);
         }
 
@@ -2799,7 +2817,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          */
         //debug=true;
         if (debug) {
-            outputArea.appendText("Entering parseTaskDef");
+            System.out.println("Entering parseTaskDef");
         }
         TreeNode tn = null;
         if (check(taskSym)) {
@@ -2814,7 +2832,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         tn.left = parseTaskBlock();
 //debug=true;
         if (debug) {
-            outputArea.appendText("Leaving parseTaskDef");
+            System.out.println("Leaving parseTaskDef");
             traverse(tn);
         }
 //debug=false;
@@ -2937,7 +2955,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
          * *********************
          */
         if (debug) {
-            outputArea.appendText("Entering parseUnaliasStmt");
+            System.out.println("Entering parseUnaliasStmt");
         }
         Context context = new Context(t);
         // System.out.println("Setting contxt for stop to (@" + tree.lineNo() + "/" + tree.charPos() +")");
@@ -2947,7 +2965,7 @@ public class Parser extends GenesisDevelopmentEnvironmentViewController {
         TreeNode tn = new TreeNode(OpVal.unaliasStmtOp, e1, null);
         tn.context = context;
         if (debug) {
-            outputArea.appendText("Leaving parseUnaliasStmt");
+            System.out.println("Leaving parseUnaliasStmt");
             traverse(tn);
         }
         return tn;

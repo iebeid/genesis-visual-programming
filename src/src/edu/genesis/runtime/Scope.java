@@ -20,18 +20,31 @@
 //  2/14/08 -- ljm: modified wrapList to also wrap strings
 package edu.genesis.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Scope {
 
     protected Hashtable<String, StickyNote> ht;
     protected Scope lexical_parent;
     protected Scope dynamic_parent;
-
+PrintStream o;
     public Scope() {
         ht = new Hashtable<>();
         lexical_parent = null;
         dynamic_parent = null;
+                                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     // lexical scoping by default
@@ -39,6 +52,13 @@ class Scope {
         ht = new Hashtable<>(s.ht);
         lexical_parent = s;
         dynamic_parent = null;
+                                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     // lexical parent, then dynamic parent
@@ -46,6 +66,13 @@ class Scope {
         ht = new Hashtable<>(s.ht);
         lexical_parent = s;
         dynamic_parent = t;
+                                try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     // This method is the "nuts and bolts" of the Scope class.  Its function

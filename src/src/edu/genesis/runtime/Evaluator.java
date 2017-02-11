@@ -76,10 +76,12 @@
  */
 package edu.genesis.runtime;
 
-import edu.genesis.view.GenesisDevelopmentEnvironmentViewController;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -88,7 +90,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
+public class Evaluator{
 
     GenesisIO out;
     Scope scope;
@@ -99,6 +101,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     public static int autoindent = 0;
     private static TreeNode root;  // root of the tree
     public static TreeNode currentStmt;
+    PrintStream o;
 
     private void init() {
         /* Add built-in function calls to the scope */
@@ -147,12 +150,20 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         inf.right = new Node(1, inf, null);
         inf.right.right = inf.right;  // create circular list
         scope.setName("infinity", inf);
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Evaluator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public Evaluator() {
         // out = new GenesisIO();
         scope = new Scope();
         init();
+        
     }
     // Instances of GenesisVal's to use in testType and testOp
     private final StringVal STRING_VAL = new StringVal("");
@@ -163,7 +174,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     // private final Iterator ITERATOR_VAL = new Iterator();
 
     static void print(String s) {
-        outputArea.appendText(s);
+        System.out.println(s);
     }
 
     ;
@@ -189,9 +200,9 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }
 
     public static void printError(String msg, TreeNode tn) {
-        outputArea.appendText("");
+        System.out.println("");
         if (tn != null) {
-            outputArea.appendText("> In file '"
+            System.out.println("> In file '"
                     + tn.fileName()
                     + "' error occurred on or about line "
                     + tn.lineNo()
@@ -199,16 +210,16 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     + tn.charPos()
                     + ".");
         } else {
-            outputArea.appendText("> Error occurred.");
+            System.out.println("> Error occurred.");
         }
-        outputArea.appendText("> " + msg);
+        System.out.println("> " + msg);
         while (tn != null && tn.lineNo() == 0) {
             tn = (TreeNode) tn.left;
         }
-        outputArea.appendText("> Stopping algorithm.");
-        outputArea.appendText("");
-        outputArea.appendText("Done interpreting program\n--------------\n");
-        outputArea.appendText("\"" + Quote.getMessage() + "\"");
+        System.out.println("> Stopping algorithm.");
+        System.out.println("");
+        System.out.println("Done interpreting program\n--------------\n");
+        System.out.println("\"" + Quote.getMessage() + "\"");
         //System.exit(1);
     }
 
@@ -245,8 +256,8 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             } else if (testType(tn, OpVal.stopStmtOp)
                     && testOp(tn, OpVal.stopStmtOp)) {  // special case 
                 if (trace) {
-                    outputArea.appendText("==> Executing:");
-                    outputArea.appendText(tn.toString()+"\n");
+                    System.out.println("==> Executing:");
+                    System.out.println(tn.toString()+"\n");
                 }
                 evalStop(tn);
             } else {
@@ -290,19 +301,19 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
     StickyNote evalStmt(Node tn) {
         if (autotrace && !testOp(tn, OpVal.stmtListOp)) {
-            outputArea.appendText("==> ");
-            outputArea.appendText(tn.toString());
+            System.out.println("==> ");
+            System.out.println(tn.toString());
         } else if (trace && !testOp(tn, OpVal.stmtListOp)) {
             // Check to see if Vector contains the current line number
             if (stopAt.contains(new Integer(((TreeNode) tn).prettyNo()))
                     || stopAt.contains(0)) {
-                outputArea.appendText("==> "); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
-                outputArea.appendText(tn.toString());  // will invoke toString, a pretty printer
+                System.out.println("==> "); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
+                System.out.println(tn.toString());  // will invoke toString, a pretty printer
                 int x;
                 boolean doAgain = true;
                 Scanner scanner = new Scanner(System.in);
                 while (doAgain) {
-                    outputArea.appendText("> ");
+                    System.out.println("> ");
                     try {
                         x = System.in.read();
                         if (x >= 0) {
@@ -310,18 +321,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                             if (ch == 'n') {
                                 doAgain = false;
                             } else if (ch == 'L') {
-                                outputArea.appendText(root.toXML());  // will invoke toString, a pretty printer
+                                System.out.println(root.toXML());  // will invoke toString, a pretty printer
                                 
                             } else if (ch == 'l') {
                                 TreeNode context = findContext(tn);
-                                outputArea.appendText(context.toString());  // will invoke toString, a pretty printer
+                                System.out.println(context.toString());  // will invoke toString, a pretty printer
                             } else if (ch == '.') {
-                                outputArea.appendText(tn.toString());  // will invoke toString, a pretty printer
+                                System.out.println(tn.toString());  // will invoke toString, a pretty printer
                             } else if (ch == 'q') {
-                                outputArea.appendText("Stopping ...");  // will invoke toString, a pretty printer
+                                System.out.println("Stopping ...");  // will invoke toString, a pretty printer
                                 //System.exit(0);
                             } else if (ch == '?') {
-                                outputArea.appendText("\n>[n,h,.,l,L,p,q,r,s?]: ");
+                                System.out.println("\n>[n,h,.,l,L,p,q,r,s?]: ");
                             } else if (ch == 'p') {
                                 String id = scanner.next();
 
@@ -329,62 +340,62 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
                                 if (n == null) {
                                     //   printError("\tIdentifier '" + tn.info.toString() + "' is not associated with a value", tn );
-                                    outputArea.appendText(id + ": " + "no value associated with '" + id + "'");
+                                    System.out.println(id + ": " + "no value associated with '" + id + "'");
                                 } else {
-                                    outputArea.appendText(id + ": " + n);
+                                    System.out.println(id + ": " + n);
                                 }
                             } else if (ch == 's') {
                                 int len = stopAt.size();
-                                outputArea.appendText("\nBreakpoint(s): ");
+                                System.out.println("\nBreakpoint(s): ");
                                 for (int i = 0; i < len; i++) {
-                                    outputArea.appendText("" + stopAt.get(i) + ' ');
+                                    System.out.println("" + stopAt.get(i) + ' ');
                                 }
-                                outputArea.appendText("\n\nSet which breakpoint? ");
+                                System.out.println("\n\nSet which breakpoint? ");
                                 Integer bp = scanner.nextInt();
                                 int pos = stopAt.indexOf(bp);
                                 if (pos == -1) {
                                     stopAt.add(bp);
                                 }
-                                // outputArea.appendText ("[n,s,r,h]: ");
+                                // System.out.println ("[n,s,r,h]: ");
                             } else if (ch == 'r') {
                                 int len = stopAt.size();
-                                outputArea.appendText("\nBreakpoint(s): ");
+                                System.out.println("\nBreakpoint(s): ");
                                 for (int i = 0; i < len; i++) {
-                                    outputArea.appendText("" + stopAt.get(i) + ' ');
+                                    System.out.println("" + stopAt.get(i) + ' ');
                                 }
-                                outputArea.appendText("\n\nDelete which breakpoint? ");
+                                System.out.println("\n\nDelete which breakpoint? ");
                                 Integer del = scanner.nextInt();
                                 int pos = stopAt.indexOf(del);
                                 if (pos >= 0) {
                                     stopAt.removeElementAt(pos);
                                 }
-                                //  outputArea.appendText ("[n,s,r,h]: ");
+                                //  System.out.println ("[n,s,r,h]: ");
                             } else if (ch == 'h') {
-                                outputArea.appendText("Input         Meaning");
-                                outputArea.appendText("-----         -------");
-                                outputArea.appendText("  p label  Display the value associated with 'label'");
-                                outputArea.appendText("  n        Advance to next breakpoint");
-                                outputArea.appendText("  h        Print this help");
-                                outputArea.appendText("  .        List the current instruction");
-                                outputArea.appendText("  l        List the containing procedure or function");
-                                outputArea.appendText("  L        List the whole algorithm");
-                                outputArea.appendText("  q        Quit");
-                                outputArea.appendText("  r        Remove breakpoint(s)");
-                                outputArea.appendText("  s        Set breakpoint(s)");
-                                outputArea.appendText("  ?        Print short help");
-                                //   outputArea.appendText ("\n[n,s,r,h]: ");
+                                System.out.println("Input         Meaning");
+                                System.out.println("-----         -------");
+                                System.out.println("  p label  Display the value associated with 'label'");
+                                System.out.println("  n        Advance to next breakpoint");
+                                System.out.println("  h        Print this help");
+                                System.out.println("  .        List the current instruction");
+                                System.out.println("  l        List the containing procedure or function");
+                                System.out.println("  L        List the whole algorithm");
+                                System.out.println("  q        Quit");
+                                System.out.println("  r        Remove breakpoint(s)");
+                                System.out.println("  s        Set breakpoint(s)");
+                                System.out.println("  ?        Print short help");
+                                //   System.out.println ("\n[n,s,r,h]: ");
                             }
                             scanner.nextLine();
                         }
                     } catch (IOException io) {
-                        outputArea.appendText("IOerror:" + io);
+                        System.out.println("IOerror:" + io);
                     }
                 }
             }
         }
         currentStmt = (TreeNode) tn;
 
-        //outputArea.appendText("Executing:" +tn);
+        //System.out.println("Executing:" +tn);
         if (testOp(tn, OpVal.idNameOp)) {
             return evalIdName(tn);
         } else if (testOp(tn, OpVal.idAliasOp)) {
@@ -440,19 +451,19 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
     void letIdNameSN(String id, StickyNote sn) {
         if (sn.val instanceof GenesisList) { // sn is an iterator, copy it
-            //outputArea.appendText ("Assigning an iterator");
+            //System.out.println ("Assigning an iterator");
             GenesisList t = new GenesisList((GenesisList) sn.val);
             sn = new StickyNote(t);
         }
         if (isIterator(id)) {
-            //outputArea.appendText("letIdNameSN: Let " + id + " name " + sn);
-            //outputArea.appendText("let Iterator Name:" +id + " " + sn.val);
+            //System.out.println("letIdNameSN: Let " + id + " name " + sn);
+            //System.out.println("let Iterator Name:" +id + " " + sn.val);
             sn = new StickyNote(sn);
             //                           SN    GV=Node   
             GenesisList gl = (GenesisList) (scope.find(id).getVal());
             if (gl.empty() || gl.off()) { // adding the first node to the list
                 gl.insert(sn);
-                //outputArea.appendText ("Off the list");
+                //System.out.println ("Off the list");
             } else {  // on the list 
                 StickyNote note = gl.get();
                 note.val = sn.getVal();
@@ -461,13 +472,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         } else {
             // debug= true;
             if (debug) {
-                outputArea.appendText("Assigning " + id + "-to-" + sn + " of type " + sn.val.getClass());
+                System.out.println("Assigning " + id + "-to-" + sn + " of type " + sn.val.getClass());
             }
             scope.setName(id, sn);
             // debug = false;
 
         }
-        //outputArea.appendText ("Retrieving sn associated with " + id + "=" + scope.search(id));
+        //System.out.println ("Retrieving sn associated with " + id + "=" + scope.search(id));
     }
 
     StickyNote evalIdName(Node tn) {
@@ -477,53 +488,53 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }
 
     StickyNote evalIdNameValue(Node tn, StickyNote result) {
-        //    outputArea.appendText("Evalling 0 "); Parser.prettyPrint((TreeNode)tn);
-        // outputArea.appendText("Left: " +tn.left); 
+        //    System.out.println("Evalling 0 "); Parser.prettyPrint((TreeNode)tn);
+        // System.out.println("Left: " +tn.left); 
         if (autotrace) {
-            outputArea.appendText(tn.left() + ": " + result);
+            System.out.println(tn.left() + ": " + result);
         }
         if (testType(tn.left(), STRING_VAL)) {
-            // outputArea.appendText("Evalling 1 ");
+            // System.out.println("Evalling 1 ");
             StickyNote sn = tn.left().info;
             
             String id = sn.toString();
-            //outputArea.appendText("Associating " + id + " with result = " + result);
-            //outputArea.appendText("Associating " + id + " with result.addr = " + result.addr());
-            //outputArea.appendText("Associating " + id + " with result.val.addr = " + result.val.addr());
+            //System.out.println("Associating " + id + " with result = " + result);
+            //System.out.println("Associating " + id + " with result.addr = " + result.addr());
+            //System.out.println("Associating " + id + " with result.val.addr = " + result.val.addr());
             letIdNameSN(id, result);
-            // outputArea.appendText("Got back id/result " + id + "/" + result);
+            // System.out.println("Got back id/result " + id + "/" + result);
             
             result = scope.search(id);
             
           
-            // outputArea.appendText ("Returning!!! " + result );
+            // System.out.println ("Returning!!! " + result );
         } // This tests whether tn.left() is an OpVal.
         // OpVal.subscriptOp happens to be an OpVal and it's handy.
         else if (testOp(tn.left(), OpVal.subscriptOp)) {
-            // outputArea.appendText("Evalling 2 "); Parser.prettyPrint((TreeNode)tn.left());
+            // System.out.println("Evalling 2 "); Parser.prettyPrint((TreeNode)tn.left());
             if (testOp(tn.left(), OpVal.subscriptOp)) {
                 GenesisList l = evalSubscript(tn.left());
                 scope.name(l, result);
             }
         } else if (testOp(tn.left(), OpVal.functionCallOp)) {
-            // outputArea.appendText("Evalling 3 ");
+            // System.out.println("Evalling 3 ");
             // Evaluate the lhs to get its sn, assign to that sn
-            // outputArea.appendText ("Got here" );
+            // System.out.println ("Got here" );
             StickyNote sn = evalExp(tn.left());
-            // outputArea.appendText ("Got " + sn);
+            // System.out.println ("Got " + sn);
             sn.val = result.getVal();
-            // outputArea.appendText ("Computed " + sn.val); 
+            // System.out.println ("Computed " + sn.val); 
         }
         return result;
     }
 
     void letIdAliasSN(String id, StickyNote sn) {
         if (isIterator(id)) {
-            //outputArea.appendText("terator Alias:" +id);
+            //System.out.println("terator Alias:" +id);
             //                           SN    GV=Node   
             //Node n = (Node) (scope.search(id).getVal());
             GenesisList gl = (GenesisList) (scope.find(id).val);
-            //outputArea.appendText("gl = " + gl);
+            //System.out.println("gl = " + gl);
             if (gl.empty() || gl.off()) { // adding the first node to the list
                 gl.insert(sn);
             } else {  // on the list 
@@ -539,7 +550,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         StickyNote result = evalExpression(tn.left().right());
         if (testType(tn.left(), new StringVal(""))) {
             String id = tn.left().info.toString();
-            //outputArea.appendText("Got here" + id);
+            //System.out.println("Got here" + id);
             letIdAliasSN(id, result);
         } // This tests whether tn.left() is an OpVal.
         // OpVal.subscriptOp happens to be an OpVal and it's handy.
@@ -555,15 +566,15 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     GenesisList evalSubscript(Node tn) {
         // first, get the list
         GenesisList l = null;
-        //outputArea.appendText ("evalSubscript:" + tn);
-        //  outputArea.appendText("Wrapping?" );
+        //System.out.println ("evalSubscript:" + tn);
+        //  System.out.println("Wrapping?" );
         if (testType(tn.left(), new StringVal(""))) {
             String id = tn.left().info.toString();
             l = scope.wrapList(id);
         } else if (testType(tn.left(), OpVal.subscriptOp) || testType(tn.left(), OpVal.dotOp)) {
             if (testOp(tn.left(), OpVal.subscriptOp) || testType(tn.left(), OpVal.dotOp)) //added dotOp chad
             {
-                //outputArea.appendText ("getting sublist for subscript");
+                //System.out.println ("getting sublist for subscript");
                 l = evalSubscript(tn.left()).getSubList();
             } else {
                 printError("In evalSubscript( Node ):\n"
@@ -576,14 +587,14 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // now, go to the right position
         //    1. get the index
         StickyNote n = evalExpression(tn.left().right());
-        //outputArea.appendText ("evaling" + tn.left().right() + ":" + n);
+        //System.out.println ("evaling" + tn.left().right() + ":" + n);
         DoubleVal d = null;
         int i = 0;
         if (n.val instanceof DoubleVal) {
             d = (DoubleVal) (n.val);
             //   2. check to make sure it's in range
             i = d.toInt();
-            //outputArea.appendText("Subscript "+ i );
+            //System.out.println("Subscript "+ i );
             if (i < 1 || i > l.size()) {
                 printError("Subscript " + i + " out of range for list "
                         + l, tn);
@@ -593,10 +604,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // Hey this means I cannot use a number as a label!
         else { // n is not a number, search in the labels
 
-            // outputArea.appendText ("Searching " + n.val); 
+            // System.out.println ("Searching " + n.val); 
             //i = l.search(("" +n.val).toLowerCase());       
             i = l.searchLabel(n);
-            //outputArea.appendText ("Found at pos  " + i); 
+            //System.out.println ("Found at pos  " + i); 
             if (i < 1 || i > l.size()) {
                 printError("'" + n.val + "' is not a valid field name for"
                         + l, tn);
@@ -620,14 +631,14 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     GenesisList evalRef(Node tn) {
         GenesisList result = null;
         if (debug) {
-            outputArea.appendText("Evaluating reference expression: ");
+            System.out.println("Evaluating reference expression: ");
             Parser.prettyPrint((TreeNode) tn);
         }
         // if the expression is an identifier, return an alias to it
         if (tn.info.val instanceof StringVal) {
-            // outputArea.appendText ("evaling label: " + tn.info.val.toString());
+            // System.out.println ("evaling label: " + tn.info.val.toString());
             String id = tn.info.toString();
-            // outputArea.appendText ("Searching for "+ id);
+            // System.out.println ("Searching for "+ id);
             StickyNote n = scope.searchRef(id);  // SN assoc with id  ... 
             // Better be a GenesisList or null (empty list)
             if (n == null) //  either a null iterator or a name that was never defined
@@ -636,7 +647,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 result = new GenesisList();  // Very speculative
             } else {
                 if (debug) {
-                    outputArea.appendText("Value/class of expression is " + n.val + "" + n.val.getClass());
+                    System.out.println("Value/class of expression is " + n.val + "" + n.val.getClass());
                 }
                 if (!(n.val instanceof GenesisList)
                         && !(n.val instanceof Node)
@@ -646,13 +657,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 if (n.val instanceof GenesisList) {
                     result = (GenesisList) n.val;
                     if (debug) {
-                        outputArea.appendText("n.val is a GenesisList" + n.val);
+                        System.out.println("n.val is a GenesisList" + n.val);
                     }
                 } else if (n.val instanceof Node) {
-                    //outputArea.appendText ("n.val is a Node" + n.val);
-                    // outputArea.appendText ("Got here");
+                    //System.out.println ("n.val is a Node" + n.val);
+                    // System.out.println ("Got here");
                     result = new GenesisList((Node) n.val);
-                    // outputArea.appendText ("Moving to the end");
+                    // System.out.println ("Moving to the end");
                     while (result.on()) {
                         result.move();
                     } // to indicate it's a top-level list
@@ -675,7 +686,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         }
         // debug = true;
         if (debug) {
-            outputArea.appendText("evalRef returns " + result + "/" + result.getClass());
+            System.out.println("evalRef returns " + result + "/" + result.getClass());
         }
         return result;
     }
@@ -685,18 +696,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // debug = true;
         StickyNote result;
         if (debug) {
-            outputArea.appendText("Evaluating expression: ");
+            System.out.println("Evaluating expression: ");
             Parser.prettyPrint((TreeNode) tn);
         }
         // if the expression is an identifier, return an alias to it
         if (tn.info.val instanceof StringVal) {
-            // outputArea.appendText ("evaling label: " + tn.info.val.toString());
+            // System.out.println ("evaling label: " + tn.info.val.toString());
             String id = tn.info.toString();
             StickyNote n = scope.find(id);  // SN assoc with id
-            // outputArea.appendText ("result is: " + n.val.getClass() + " at " + (Object)n);
+            // System.out.println ("result is: " + n.val.getClass() + " at " + (Object)n);
 
             if (debug) {
-                outputArea.appendText("evalExp returning:" + n.toString());
+                System.out.println("evalExp returning:" + n.toString());
             }
             // return (n);
             result = n;
@@ -710,7 +721,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             result = tn.left().info;
         } else if (testOp(tn, OpVal.functionCallOp)) {
             result = evalFunctionCall(tn);
-            //outputArea.appendText("got back1");
+            //System.out.println("got back1");
         } else if (testOp(tn, OpVal.addOp)) {
             result = evalAddOp(tn);
         } else if (testOp(tn, OpVal.subtractOp)) {
@@ -736,12 +747,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         } else if (testOp(tn, OpVal.aliasOp)) {
             String id = tn.left.info.toString();
             if (isIterator(id)) {
-                //outputArea.appendText("Processing aliased iterator");
+                //System.out.println("Processing aliased iterator");
                 // Node n = (Node) (scope.search(id).getVal());
                 // result =  n.getVal();
                 GenesisList gl = (GenesisList) scope.find(id).val;
-                //outputArea.appendText("gl = " + gl);
-                //outputArea.appendText("gl.get.addr = " + gl.get().val.addr());
+                //System.out.println("gl = " + gl);
+                //System.out.println("gl.get.addr = " + gl.get().val.addr());
                 result = gl.get();
             } else {
                 result = scope.alias(id);
@@ -749,7 +760,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         } else if (testOp(tn, OpVal.subscriptOp)) {
             result = evalSubscript(tn).get();
         } else if (testOp(tn, OpVal.trueOp) || testOp(tn, OpVal.otherwiseOp)) {
-            // outputArea.appendText( "Evaling true"); 
+            // System.out.println( "Evaling true"); 
             result = new StickyNote(true);
         } else if (testOp(tn, OpVal.falseOp)) {
             result = new StickyNote(false);
@@ -763,7 +774,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         }
         //debug=true;
         if (debug) {
-            outputArea.appendText("evalExpression returns " + result);
+            System.out.println("evalExpression returns " + result);
         }
         return result;
     } // evalExp
@@ -772,24 +783,24 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         //debug = true;
         StickyNote result;
         if (debug) {
-            outputArea.appendText("Evaluating expression: ");
+            System.out.println("Evaluating expression: ");
             Parser.prettyPrint((TreeNode) tn);
         }
         //debug = false;
         // if the expression is an identifier, return an alias to it
         if (tn.info.val instanceof StringVal) {
-            // outputArea.appendText ("evaling label: " + tn.info.val.toString());
+            // System.out.println ("evaling label: " + tn.info.val.toString());
             String id = tn.info.toString();
             StickyNote n = scope.alias(id);  // SN assoc with id
-            // outputArea.appendText ("result is: " + n.val.getClass() + " at " + (Object)n);
+            // System.out.println ("result is: " + n.val.getClass() + " at " + (Object)n);
 
             if (n == null) {
                 printError("\tIdentifier '" + tn.info.toString() + "' is not associated with a value", tn);
             }
             if (n.val instanceof GenesisList) {
-                // outputArea.appendText("Iterator found for list:"+n.val);  
+                // System.out.println("Iterator found for list:"+n.val);  
                 n = ((GenesisList) n.val).get();
-                // outputArea.appendText("Iterator found: "+n);  
+                // System.out.println("Iterator found: "+n);  
             }
             //out.println("evalExpression returning:" + n.toString()); 
             // return (n);
@@ -805,7 +816,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         } else if (testOp(tn, OpVal.functionCallOp)) {
             // debug = true;
             result = evalFunctionCall(tn);
-            //outputArea.appendText("Got back2");
+            //System.out.println("Got back2");
             //  debug = false;
         } else if (testOp(tn, OpVal.addOp)) {
             result = evalAddOp(tn);
@@ -833,14 +844,14 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             result = evalListOp(tn);
         } else if (testOp(tn, OpVal.aliasOp)) {
             String id = tn.left.info.toString();
-            //     outputArea.appendText("Processing aliased id");
+            //     System.out.println("Processing aliased id");
             if (isIterator(id)) {
-                //outputArea.appendText("Processing aliased iterator");
+                //System.out.println("Processing aliased iterator");
                 // Node n = (Node) (scope.search(id).getVal());
                 // result =  n.getVal();
                 GenesisList gl = (GenesisList) scope.find(id).val;
-                //outputArea.appendText("gl = " + gl);
-                //outputArea.appendText("gl.get.addr = " + gl.get().val.addr());
+                //System.out.println("gl = " + gl);
+                //System.out.println("gl.get.addr = " + gl.get().val.addr());
                 result = gl.get();
             } else {
                 result = scope.alias(id);
@@ -852,7 +863,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         } else if (testOp(tn, OpVal.subscriptOp)) {
             result = evalSubscript(tn).get();
         } else if (testOp(tn, OpVal.trueOp) || testOp(tn, OpVal.otherwiseOp)) {
-            // outputArea.appendText( "Evaling true"); 
+            // System.out.println( "Evaling true"); 
             result = new StickyNote(true);
         } else if (testOp(tn, OpVal.falseOp)) {
             result = new StickyNote(false);
@@ -866,10 +877,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         }
         // debug=true;
         if (debug) {
-            outputArea.appendText("Expression value:" + result + "type: " + result.val.getClass());
+            System.out.println("Expression value:" + result + "type: " + result.val.getClass());
                
         }
-        //outputArea.appendText("Returning from Expression ");
+        //System.out.println("Returning from Expression ");
         return result;
     } // evalExpression
 
@@ -899,45 +910,45 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         if (s1.val instanceof GenesisList || s2.val instanceof GenesisList) {
             printError("1. Addition not possible for '" + tn + "'", tn);
         } else if (s1.val instanceof Node || s2.val instanceof Node) {
-            // outputArea.appendText("===> Adding");
+            // System.out.println("===> Adding");
 
             if (s1.val instanceof Node) {
-                //  outputArea.appendText("===> Adding:" + s1);
+                //  System.out.println("===> Adding:" + s1);
                 GenesisList gl1 = new GenesisList((Node) s1.val).copy(); // copy the nodes
                 while (gl1.on()) {
                     gl1.move();
                 } // move to the end of list g1
                 if (s2.val instanceof Node) {
-                    //outputArea.appendText("Forming gl2");
+                    //System.out.println("Forming gl2");
                     GenesisList gl2 = new GenesisList((Node) s2.val);
                     gl2.reset();
                     while (gl2.on()) {
-                        // outputArea.appendText ("Evaluator: Appending to " + gl1 );
-                        // outputArea.appendText( "Evaluator: the value:" + gl2.get());
-                        // outputArea.appendText ("Evaluator: Calling insert with");
+                        // System.out.println ("Evaluator: Appending to " + gl1 );
+                        // System.out.println( "Evaluator: the value:" + gl2.get());
+                        // System.out.println ("Evaluator: Calling insert with");
                         gl1.insert(new StickyNote(gl2.get()));
-                        // outputArea.appendText ("Evaluator: giving ... " + gl1);
+                        // System.out.println ("Evaluator: giving ... " + gl1);
                         gl2.move();
                     }
-                    // outputArea.appendText ("Done!");
+                    // System.out.println ("Done!");
                 } else if (s2.val instanceof StringVal) {
                     gl1.insert(new StickyNote(s2));
                 } else if (s2.val instanceof NumberVal) {
-                    //outputArea.appendText("Appending " + s2 + " to " + gl1);
+                    //System.out.println("Appending " + s2 + " to " + gl1);
                     StickyNote temp = scope.find("correct");
                     //       if (temp != null) 
-                    //         outputArea.appendText ("Correct is: " + temp.val.getClass() + " at " + (Object)temp);
+                    //         System.out.println ("Correct is: " + temp.val.getClass() + " at " + (Object)temp);
                     gl1.insert(new StickyNote(s2));
                 } else {
                     printError("2. Addition not possible for '" + tn + "'.", tn);
                 }
                 gl1.reset();
 
-                // outputArea.appendText ("Done!" + gl1.toString());
+                // System.out.println ("Done!" + gl1.toString());
 
                 answer = new StickyNote(gl1.current());
-                // outputArea.appendText ("Done!!"+ gl1.current().info);
-                // outputArea.appendText ("giving ... " + answer);
+                // System.out.println ("Done!!"+ gl1.current().info);
+                // System.out.println ("giving ... " + answer);
             } else {  // s2 must be an instanceof a node
                 GenesisList gl2 = new GenesisList((Node) s2.val).copy(); // copy the codes
                 //Utility.println("Copying " + s1 + " to " + s2);
@@ -982,7 +993,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     + s1
                     + " and " + s2 + "'!!!", tn);
         }
-        // outputArea.appendText("Returning " + answer);
+        // System.out.println("Returning " + answer);
         return answer;
     }
 
@@ -1044,13 +1055,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }//end evalUnaryMinusOp
 
     StickyNote evalColonOp(Node tn) {
-        // outputArea.appendText("evalColonOp:" );
+        // System.out.println("evalColonOp:" );
         // Parser.prettyPrint((TreeNode)tn);
         StickyNote d = null;
         try {
             d = (evalExpression(tn.left().right())); // get the actual expression
-            // outputArea.appendText ("Setting d to " +d);
-            // outputArea.appendText ("Setting d's label to " +evalExpression(tn.left()));
+            // System.out.println ("Setting d to " +d);
+            // System.out.println ("Setting d's label to " +evalExpression(tn.left()));
             d.setLabel(evalExpression(tn.left()).val);    // associate the label
         } catch (ClassCastException e) {
             printError("Both operands must be numbers to perform division", tn);
@@ -1062,13 +1073,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         //MetaNode mn = new MetaNode();
         GenesisList l = new GenesisList();
 
-        // outputArea.appendText("evalListOp: " + tn);
+        // System.out.println("evalListOp: " + tn);
         GenesisList.quoteStrings(true);
         tn = tn.left();
         while (tn != null) {
             if (testOp(tn, OpVal.aliasOp)) {      // ljm -- 6/20/04
                 StickyNote result = evalExpression(tn);
-                // outputArea.appendText("Inserting address in list:" + result.val.addr());
+                // System.out.println("Inserting address in list:" + result.val.addr());
          /*
                  if (tn.getLabel() == null )
                  l.insert( evalExpression( tn ) );
@@ -1089,35 +1100,35 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                  // l.insert( scope.name( evalExpression( tn ) ));  
                  */
             }
-            // outputArea.appendText("Resulting list is:" +l);
+            // System.out.println("Resulting list is:" +l);
             tn = tn.right();
         }
         //l.reset();  l.insert(new MetaNode());
         if (debug) {
-            outputArea.appendText("evalListOp returning " + l);
+            System.out.println("evalListOp returning " + l);
         }
-        // outputArea.appendText ("Exiting ..."); System.exit(1);
+        // System.out.println ("Exiting ..."); System.exit(1);
 
         if (debug) {
-            outputArea.appendText("Expression value:" + l + "type: " + l.getClass());
+            System.out.println("Expression value:" + l + "type: " + l.getClass());
         }
         StickyNote stickynote = scope.alias(l);
         if (debug) {
-            outputArea.appendText("Expression value:" + stickynote + "type: " + stickynote.val.getClass());
+            System.out.println("Expression value:" + stickynote + "type: " + stickynote.val.getClass());
         }
         return stickynote;
     }//end evalListOp
 
     StickyNote evalSelect(Node tn) {
         if (debug) {
-            outputArea.appendText("Executing Select");
+            System.out.println("Executing Select");
             Parser.prettyPrint((TreeNode) tn);
         }
         Node cond, stmt;
         tn = tn.left();
         while (tn != null) // for each guardedStmt
         {
-            //    outputArea.appendText( "evalSelect:\t\tgetnfo = " + getnfo( tn ) );
+            //    System.out.println( "evalSelect:\t\tgetnfo = " + getnfo( tn ) );
 
             cond = tn.left();
             stmt = cond.right();
@@ -1135,7 +1146,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     boolean evalCondition(Node tn) {
         StickyNote lhs, rhs;
         boolean l, r;
-        // outputArea.appendText("Entering evalCondition with" + tn.info);
+        // System.out.println("Entering evalCondition with" + tn.info);
         //Parser.traverse((TreeNode)tn);
         if (testOp(tn, OpVal.trueOp)) {
             return true;
@@ -1165,7 +1176,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             l = evalCondition(tn.left());
             return !l;
         }
-        // outputArea.appendText("After test for " + OpVal.trueOp + testOp(tn,OpVal.trueOp));
+        // System.out.println("After test for " + OpVal.trueOp + testOp(tn,OpVal.trueOp));
         if (testOp(tn, OpVal.ltOp)
                 || testOp(tn, OpVal.leOp)
                 || testOp(tn, OpVal.gtOp)
@@ -1175,13 +1186,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
             lhs = evalExpression(tn.left());
             rhs = evalExpression(tn.left().right());
-            //outputArea.appendText ("Comparing code " + tn.left() + " with " + tn.left().right());
-            //outputArea.appendText ("Comparing value" + lhs.val + " with " + rhs.val);
-            //outputArea.appendText ("Comparing class" + lhs.val.getClass() + " with " + rhs.val.getClass());
+            //System.out.println ("Comparing code " + tn.left() + " with " + tn.left().right());
+            //System.out.println ("Comparing value" + lhs.val + " with " + rhs.val);
+            //System.out.println ("Comparing class" + lhs.val.getClass() + " with " + rhs.val.getClass());
             // OpVal.ltOp, OpVal.leOp, OpVal.gtOp, OpVal.geOp, OpVal.eqOp, OpVal.neOp
             if (!(lhs.val instanceof GV) || !(rhs.val instanceof GV)) {
-                // outputArea.appendText (lhs.val instanceof GV);
-                // outputArea.appendText (rhs.val instanceof GV);
+                // System.out.println (lhs.val instanceof GV);
+                // System.out.println (rhs.val instanceof GV);
                 return (false); // Just to get around the inability of the compiler to
             }
             if (testOp(tn, OpVal.ltOp)) {
@@ -1195,7 +1206,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             } else if (testOp(tn, OpVal.eqOp)) {
                 // if (lhs.val instanceof MetaNode )  {lhs =  ((MetaNode)lhs.val).right;}
                 //if (rhs.val instanceof MetaNode )  {rhs =  ((MetaNode)lhs.val).right;}
-                //outputArea.appendText ("Calling eq for "+ lhs.val + " and " + rhs.val); 
+                //System.out.println ("Calling eq for "+ lhs.val + " and " + rhs.val); 
                 return ((GV) (lhs.val)).eq(rhs.val);
             } else if (testOp(tn, OpVal.neOp)) {
                 return ((GV) (lhs.val)).ne(rhs.val); // ljm -- 6/20/04
@@ -1207,7 +1218,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             return (false);
         } else {
             StickyNote sn = evalExpression(tn);
-            // outputArea.appendText("Class of sn is "+ sn.val.getClass());
+            // System.out.println("Class of sn is "+ sn.val.getClass());
             if (sn.val instanceof TruthVal) {
                 return ((TruthVal) sn.val).val;
             } else {
@@ -1220,12 +1231,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }//end evalCondition
 
     StickyNote evalEmit(Node tn) {
-        outputArea.appendText("Emit not implemented");
+        System.out.println("Emit not implemented");
         return null;
     }//end evalEmit
 
     StickyNote evalConcat(Node tn, boolean appendSpace) {
-        // outputArea.appendText("Entering evalConcat");
+        // System.out.println("Entering evalConcat");
         StickyNote sn = null;
         StringBuffer result = new StringBuffer(1000);
         tn = tn.left(); // skip down to the stuff to print
@@ -1238,27 +1249,27 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             }
             tn = tn.right();
         }
-        // outputArea.appendText("Leaving evalConcat");
+        // System.out.println("Leaving evalConcat");
         sn = new StickyNote(result.toString());
         return sn;
     }//end evalConcat
 
     StickyNote evalEcho(Node tn, boolean appendSpace) {
-        // outputArea.appendText("Entering evalEcho");
+        // System.out.println("Entering evalEcho");
         StickyNote sn = evalConcat(tn, appendSpace);
-        outputArea.appendText(sn.toString());
+        System.out.println(sn.toString());
         tn = tn.right();
-        // outputArea.appendText("Leaving evalEcho");
+        // System.out.println("Leaving evalEcho");
         return sn;
     }// end evalEcho
 
     StickyNote evalPrint(Node tn) {
         if (debug) {
-            outputArea.appendText("Executing evalPrint");
+            System.out.println("Executing evalPrint");
             Parser.prettyPrint((TreeNode) tn);
         }
         StickyNote sn = evalEcho(tn, true);
-        outputArea.appendText(""); // ljm -- 6/19/04
+        System.out.println(""); // ljm -- 6/19/04
         return sn;
     }// end evalPrint
 
@@ -1288,7 +1299,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             } else if (testType(n, OpVal.whileOp)) {
                 n = n.right();
             } else {
-                outputArea.appendText("In mangledDefName: NOT SUPPOSED TO BE HERE: " + fname);
+                System.out.println("In mangledDefName: NOT SUPPOSED TO BE HERE: " + fname);
             }
         }
         return fname;
@@ -1297,12 +1308,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     StickyNote evalFunctionDef(Node tn) {
         // debug=true;
         if (debug) {
-            outputArea.appendText("Executing evalFunctionDef");
+            System.out.println("Executing evalFunctionDef");
             Parser.prettyPrint((TreeNode) tn);
         }
         String name = buildMangledDefName(tn);
         if (autotrace) {
-            outputArea.appendText("Defining:" + name);
+            System.out.println("Defining:" + name);
         }
         // first, build the mangled function name
         // then, just "name" it
@@ -1315,10 +1326,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         Node n = tn.left();
         int i;
 
-        //outputArea.appendText("----->");
+        //System.out.println("----->");
         while (n != null) {
             i = 0;
-            //outputArea.appendText(fname);
+            //System.out.println(fname);
             if (testType(n, new StringVal(""))) {
                 fname += n.info.val.toString();
                 n = n.right();
@@ -1336,17 +1347,17 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             } else if (testType(n, OpVal.whileOp)) { //skip
                 n = n.right();
             } else {
-                outputArea.appendText("In buildMangledFunctionCallName: NOT SUPPOSED TO BE HERE" + n.getVal());
+                System.out.println("In buildMangledFunctionCallName: NOT SUPPOSED TO BE HERE" + n.getVal());
                 System.exit(1);
             }
         }
-        // outputArea.appendText( "Got fname = "+ fname );
+        // System.out.println( "Got fname = "+ fname );
         return fname;
     }//end buildMangledFunctionCallName
 
     StickyNote evalFunctionCall(Node tn) {
         if (debug) { // && ! testOp ( tn, OpVal.stmtListOp)) 
-            outputArea.appendText("Executing evalFunctionCall:");
+            System.out.println("Executing evalFunctionCall:");
             Parser.prettyPrint((TreeNode) tn);
         }
         StickyNote returnVal = null;  // To store the returned value
@@ -1354,11 +1365,11 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // first, build the mangled name and collect the parameters
         String fname = buildMangledFunctionCallName(tn);
         if (autotrace) {
-            outputArea.appendText("Calling:" + fname);
+            System.out.println("Calling:" + fname);
             autoindent = autoindent + 4;
         }
         if (debug) {
-            outputArea.appendText("fname = " + fname);
+            System.out.println("fname = " + fname);
         }
         // now, set up scope
         //
@@ -1372,7 +1383,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         Node call = tn.left(); // skip to the function invocation
         //debug=true;
         if (debug) {
-            outputArea.appendText("Grabbing definition for  " + fname);
+            System.out.println("Grabbing definition for  " + fname);
         }
 
         // next, grab the definition
@@ -1380,21 +1391,21 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // This will be true in the scope we have "function" or "procedure" associated
         // with the mangled name
         StickyNote temp = scope.name(fname);
-        // outputArea.appendText("Got back");
+        // System.out.println("Got back");
         if (temp == null) {
             printError("The function " + fname + " has not been defined", tn);
         }
         Node def = (Node) (scope.name(fname).val);
 
         if (debug) {
-            outputArea.appendText("Got to here with fname=" + fname);
+            System.out.println("Got to here with fname=" + fname);
         }
         if (debug) {
-            outputArea.appendText("def is " + def.info + def.info.getClass());
+            System.out.println("def is " + def.info + def.info.getClass());
         }
         if (def.info.val.toString().equals("procedure")) {  // built-in procedure
             if (debug) {
-                outputArea.appendText("Calling builtin procedure " + fname);
+                System.out.println("Calling builtin procedure " + fname);
             }
 
             if (fname.equals("*move(1)") || fname.equals("*move(1)forward")) {
@@ -1412,9 +1423,9 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
 
                 // GenesisList.currentIndicator = "*"; 
-                // outputArea.appendText ("Moving: " +argument);
+                // System.out.println ("Moving: " +argument);
                 argument.move();
-                // outputArea.appendText ("Moved: " +argument);
+                // System.out.println ("Moved: " +argument);
             } /*
              * Move(A) to (B): A must be a label; B is either a label
              * or B is an expression.
@@ -1439,7 +1450,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 String name2 = iter2.info.toString();
                 StickyNote s1 = scope.find(name1);
                 StickyNote s2 = scope.find(name2);
-                //outputArea.appendText ("Setting " + iter1.info.val + " to " + iter2.info.val);
+                //System.out.println ("Setting " + iter1.info.val + " to " + iter2.info.val);
                 // First: moving to a named iterator
                 if (s2 != null && s2.val instanceof GenesisList) {
                     GenesisList gl2;
@@ -1447,37 +1458,37 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     if (s1 == null) {  // source not in scope; set it up as an iterator
                         GenesisList gl1 = new GenesisList(gl2);
                         int pos = gl2.pos();
-                        //outputArea.appendText("Pos" + pos);
+                        //System.out.println("Pos" + pos);
                         gl1.moveTo(pos);
-                        //outputArea.appendText(name1 +":" + gl1);
+                        //System.out.println(name1 +":" + gl1);
                         //scope.alias(name1,gl1); 
                         letIdNameSN(name1, new StickyNote(gl1));
-                        //outputArea.appendText(name1 +":" + scope.find(name1));
+                        //System.out.println(name1 +":" + scope.find(name1));
                     } else {
                         s1.val = new GenesisList(gl2);
                     }
                 } else { // s2 is null or s2 is not a GenesisList (an iterator)
                     StickyNote val2 = evalExpression(iter2);
                     // RHS an iterator? Then moving to a previously computed iterator
-                    // outputArea.appendText ("Setting " + iter1.info.val + " to " + iter2.info.val);
+                    // System.out.println ("Setting " + iter1.info.val + " to " + iter2.info.val);
                     if (val2.val instanceof GenesisList) {
                         GenesisList gl2;
                         gl2 = (GenesisList) val2.val;
-                        // outputArea.appendText("Processing: " + val2 );
+                        // System.out.println("Processing: " + val2 );
                         if (s1 == null) {  // source not in scope; set it up as an iterator
                             GenesisList gl1 = new GenesisList(gl2);
                             int pos = gl2.pos();
-                            //outputArea.appendText("Pos" + pos);
+                            //System.out.println("Pos" + pos);
                             gl1.moveTo(pos);
-                            //outputArea.appendText(name1 +":" + gl1);
+                            //System.out.println(name1 +":" + gl1);
                             //scope.alias(name1,gl1); 
                             letIdNameSN(name1, new StickyNote(gl1));
-                            //outputArea.appendText(name1 +":" + scope.find(name1));
+                            //System.out.println(name1 +":" + scope.find(name1));
                         } else {
                             s1.val = new GenesisList(gl2);
                         }
                     } else if (val2.val instanceof DoubleVal) { //moving to a position
-                        // outputArea.appendText ("Setting " + iter1.info.val + " to " + iter2.info.val + s1);
+                        // System.out.println ("Setting " + iter1.info.val + " to " + iter2.info.val + s1);
                         int d = ((DoubleVal) val2.val).toInt();
                         if (s1 == null) {  // source not in scope; set it up as an iterator
                             printError("Cannot move non-iterator " + name1
@@ -1486,7 +1497,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                             printError("Cannot move non-iterator " + name1
                                     + " to  a position");
                         } else {
-                            //outputArea.appendText ("Moving to new list");
+                            //System.out.println ("Moving to new list");
                             ((GenesisList) s1.val).moveTo(d);
                         }
                     } else {
@@ -1545,8 +1556,8 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 Node dest2 = new TreeNode(OpVal.idNameOp,
                         (TreeNode) call.right.right.right.right.right.left.right,
                         null);
-                // outputArea.appendText("dest1:" + dest1);
-                // outputArea.appendText("dest1:" + dest2);
+                // System.out.println("dest1:" + dest1);
+                // System.out.println("dest1:" + dest2);
                 // Must split at offset into two lists
                 if (!(arg1 instanceof Node)) {
                     printError("First value passed to split must be a list; found: "
@@ -1559,8 +1570,8 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
                 Node source = (Node) arg1;
                 double offset = ((DoubleVal) arg2).getVal();
-                // outputArea.appendText("source:" + source);
-                // outputArea.appendText("offset:" + offset);
+                // System.out.println("source:" + source);
+                // System.out.println("offset:" + offset);
                 StickyNote result = null;
 
                 //if (offset  < 1) { 
@@ -1572,7 +1583,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     evalIdNameValue(dest1, new StickyNote(n));
                     evalIdNameValue(dest2, new StickyNote(source));
                 } else {
-                    // outputArea.appendText("calling evalIdNameValue with " + dest1 + source);
+                    // System.out.println("calling evalIdNameValue with " + dest1 + source);
                     evalIdNameValue(dest1, new StickyNote(source));
                     while (source != null && offset > 1) {
                         source = source.next();
@@ -1587,16 +1598,16 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
                 }
             } else if (fname.equals("*set_trace_on(0)")) {
-                //outputArea.appendText("Tracing turned on");
+                //System.out.println("Tracing turned on");
                 autotrace = true;
             } else if (fname.equals("*set_trace_off(0)")) {
-                //outputArea.appendText("Tracing turned off");
+                //System.out.println("Tracing turned off");
                 autotrace = false;
             }
             returnVal = new StickyNote();
         } else if (def.info.val.toString().equals("function")) {  // built-in function
             if (debug) {
-                outputArea.appendText("Calling builtin function " + fname);
+                System.out.println("Calling builtin function " + fname);
             }
             if (fname.equals("*integer(1)")) {
                 GenesisVal argument = evalExpression(call.right.left).val;
@@ -1677,7 +1688,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
                 }
                 // GenesisList.currentIndicator = "*";
-                //outputArea.appendText("Computing position in" + arg1);
+                //System.out.println("Computing position in" + arg1);
                 int d = arg1.pos();
                 returnVal = new StickyNote(new DoubleVal(d));
             } else if (fname.equals("*fractional(1)")) {
@@ -1801,7 +1812,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             } else if (fname.equals("*is(1)a_list?")) {
                 //if(!(call.right.left.info.val instanceof StringVal)) return(new StickyNote(false));
                 GenesisVal argument = evalExpression(call.right.left).val;
-                //outputArea.appendText (fname + argument.getClass());
+                //System.out.println (fname + argument.getClass());
                 if ((argument instanceof Node)) {
                     return (new StickyNote(true));
                 } else {
@@ -1863,7 +1874,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 //GenesisList.currentIndicator = "*"; // debug = true;
                 //debug = true;
                 if (debug) {
-                    outputArea.appendText("Processing iterator(" + call.right.left.info.val.toString() + ")");
+                    System.out.println("Processing iterator(" + call.right.left.info.val.toString() + ")");
                 }
                 if (call.right.left.info.val instanceof StringVal) {
                     /*
@@ -1872,17 +1883,17 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                      * must return the stickynote associated with m and not a new stickynote
                      */
                     String str = call.right.left.info.val.toString();
-                    //outputArea.appendText("Searching for " +str);
+                    //System.out.println("Searching for " +str);
                     StickyNote sn = scope.searchRef(str);   // search for corresponding to iterator
                     if (sn == null) {
                         printError("Iterator() is trying to form an iterator from a name with no associated value: " + str);
                     }
-                    //outputArea.appendText ("Found: ("  + sn.val.getClass() +")");
+                    //System.out.println ("Found: ("  + sn.val.getClass() +")");
                     if (sn.val instanceof GenesisList) {
-                        //outputArea.appendText ("Got in here2");
-                        //outputArea.appendText ("Iterator for " + sn.val + "Pos:"+ ((GenesisList) sn.val).pos());
+                        //System.out.println ("Got in here2");
+                        //System.out.println ("Iterator for " + sn.val + "Pos:"+ ((GenesisList) sn.val).pos());
                         //StickyNote s = new StickyNote(new GenesisList((GenesisList) sn.val));
-                        //outputArea.appendText ("Iterator for " + s.val + "Pos:" + ((GenesisList) s.val).pos());
+                        //System.out.println ("Iterator for " + s.val + "Pos:" + ((GenesisList) s.val).pos());
 
                         return (sn);
                         //return(s);
@@ -1893,22 +1904,22 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     }
                     printError("Iterator() is trying to form an iterator from non-iterator: " + sn, tn);
                 }
-                //outputArea.appendText("EvalRefing" + call.right.left.info);
+                //System.out.println("EvalRefing" + call.right.left.info);
                 GenesisVal argument = evalRef(call.right.left);
                 //GenesisVal argument = evalExpression(call.right.left).val; 
-                //outputArea.appendText("Back:" + call.right.left+ ' ' + argument );
+                //System.out.println("Back:" + call.right.left+ ' ' + argument );
                 //GenesisVal argument = scope.searchRef(call.right.left); 
                 if (!(argument instanceof GenesisList) && !(argument instanceof Node)) {
                     printError("Iterator() is trying to form an iterator from  " + argument
                             + ". which needs to be an iterator, a list or a position in an list.", tn);
                 }
-                //outputArea.appendText("Returning"+ (argument instanceof GenesisList));
+                //System.out.println("Returning"+ (argument instanceof GenesisList));
                 if (argument instanceof GenesisList) {  // The arg is an iterator
-                    //outputArea.appendText("Creating new GL from " + argument);
+                    //System.out.println("Creating new GL from " + argument);
                     GenesisList gl = new GenesisList((GenesisList) argument);
-                    // outputArea.appendText("New GL list created " + gl);
+                    // System.out.println("New GL list created " + gl);
                     // gl.reset();
-                    //outputArea.appendText("Returning -- " + gl);
+                    //System.out.println("Returning -- " + gl);
                     return (new StickyNote(gl));
                 } else { // arg is a Node, i.e. some raw list; make up an iterator for it
                     return (new StickyNote(new GenesisList((Node) argument)));
@@ -1926,7 +1937,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 //GenesisList.currentIndicator = "*"; // debug = true;
                 //debug = true;
                 if (debug) {
-                    outputArea.appendText("Processing iterator(" + call.right.left.info.val.toString() + ")");
+                    System.out.println("Processing iterator(" + call.right.left.info.val.toString() + ")");
                 }
                 if (call.right.left.info.val instanceof StringVal) {
                     /*
@@ -1935,40 +1946,40 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                      * must return the stickynote associated with m and not a new stickynote
                      */
                     String str = call.right.left.info.val.toString();
-                    // outputArea.appendText("Searching for " +str);
+                    // System.out.println("Searching for " +str);
                     StickyNote sn = scope.searchRef(str);   // search for corresponding to iterator
                     if (sn == null) {
                         printError("Iterator() is trying to form an iterator from a non-existent value: " + str);
                     }
-                    //outputArea.appendText ("Found: ("  + sn.val.getClass() +")");
+                    //System.out.println ("Found: ("  + sn.val.getClass() +")");
                     if (sn.val instanceof GenesisList) {
-                        //outputArea.appendText ("Got in here");
-                        //outputArea.appendText ("Iterator for " + sn.val + "Pos:"+ ((GenesisList) sn.val).pos());
+                        //System.out.println ("Got in here");
+                        //System.out.println ("Iterator for " + sn.val + "Pos:"+ ((GenesisList) sn.val).pos());
                         //StickyNote s = new StickyNote(new GenesisList((GenesisList) sn.val));
-                        //outputArea.appendText ("Iterator for " + s.val + "Pos:" + ((GenesisList) s.val).pos());
-                        //outputArea.appendText ("Returning iterator for " + s);
+                        //System.out.println ("Iterator for " + s.val + "Pos:" + ((GenesisList) s.val).pos());
+                        //System.out.println ("Returning iterator for " + s);
                         return (sn);
                         //return(s);
                     }
                     printError("Iterator() is trying to form an iterator from non-iterator: " + sn, tn);
                 }
-                //outputArea.appendText("EvalRefing" + call.right.left.info);
+                //System.out.println("EvalRefing" + call.right.left.info);
                 GenesisVal argument = evalRef(call.right.left);
                 //GenesisVal argument = evalExpression(call.right.left).val; 
-                //outputArea.appendText("Back" + call.right.left.info);
+                //System.out.println("Back" + call.right.left.info);
                 //GenesisVal argument = scope.searchRef(call.right.left); 
-                //outputArea.appendText (argument.getClass()); 
+                //System.out.println (argument.getClass()); 
                 if (!(argument instanceof GenesisList) && !(argument instanceof Node)) {
                     printError("Iterator() is trying to form an iterator from  " + argument
                             + ". which needs to be an iterator.", tn);
                 }
-                //outputArea.appendText("Returning"+ (argument instanceof GenesisList));
+                //System.out.println("Returning"+ (argument instanceof GenesisList));
                 if (argument instanceof GenesisList) {  // The arg is an iterator
-                    //outputArea.appendText("Creating new GL from " + argument);
+                    //System.out.println("Creating new GL from " + argument);
                     GenesisList gl = new GenesisList((GenesisList) argument);
-                    // outputArea.appendText("New GL list created " + gl);
+                    // System.out.println("New GL list created " + gl);
                     //gl.reset();
-                    //outputArea.appendText("Returning --" + gl);
+                    //System.out.println("Returning --" + gl);
                     return (new StickyNote(gl));
                 } else { // arg is a Node, i.e. some raw list; make up an iterator for it
                     return (new StickyNote(new GenesisList((Node) argument)));
@@ -1987,7 +1998,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 GenesisVal arg1 = evalExpression(call.right.left).val;
                 GenesisVal arg2 = evalExpression(call.right.left.right).val;
                 // arg1 should be a Node 
-                //outputArea.appendText("arg1 is " + arg1);
+                //System.out.println("arg1 is " + arg1);
                 if (!(arg1 instanceof Node)) {
                     printError("Attempting to compute the sublist of '"
                             + call.right.left + "' which is not a list:" + arg1, tn);
@@ -1999,18 +2010,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
                 Node n = (Node) arg1;
                 double d = ((DoubleVal) arg2).getVal();
-                // outputArea.appendText ("Moving from " + n.info + n.getClass());
+                // System.out.println ("Moving from " + n.info + n.getClass());
                 while (d > 1 && n != null) {
-                    // outputArea.appendText ("Moving  with d="+ d);
+                    // System.out.println ("Moving  with d="+ d);
                     if (!(n instanceof MetaNode)) {
                         d = d - 1;
                     }
                     n = n.right();
-                    //outputArea.appendText ("Moved to from " + n.info + n.getClass() 
+                    //System.out.println ("Moved to from " + n.info + n.getClass() 
                     //                + "with d="+ d);
                 }
 
-                //outputArea.appendText ("Done moving" + n);
+                //System.out.println ("Done moving" + n);
                 if (n == null) {
                     n = new MetaNode();
                 }
@@ -2029,7 +2040,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 } else {
                     arg1 = evalExpression(call.right.left).val;
                 }
-                //outputArea.appendText("arg1 is " + arg1);
+                //System.out.println("arg1 is " + arg1);
                 // arg1 should be a Node 
           /*
                  if (arg1 == null) {
@@ -2060,7 +2071,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 } else {
                     arg1 = evalExpression(call.right.left).val;
                 }
-                //outputArea.appendText("arg1 is " + arg1);
+                //System.out.println("arg1 is " + arg1);
                 // arg1 should be a Node 
           /*
                  if (arg1 == null) {
@@ -2100,7 +2111,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                  "L"(1:23)  <--- arg1
                  */
                 GenesisVal arg1 = evalExpression(call.right.left).val;
-                //outputArea.appendText("arg1 is " + arg1);
+                //System.out.println("arg1 is " + arg1);
                 // arg1 should be a Node 
           /*
                  if (arg1 == null) {
@@ -2115,7 +2126,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                             + call.right.left + "' which is not a list:" + arg1, tn);
                 }
                 Node n = (Node) arg1;
-                // outputArea.appendText ("Moving from " + n.info + n.getClass());
+                // System.out.println ("Moving from " + n.info + n.getClass());
                 while (n != null && n instanceof MetaNode) {
                     n = n.right();
                 }
@@ -2133,7 +2144,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                  "L"(1:23)  <--- arg1
                  */
                 GenesisVal arg1 = evalExpression(call.right.left).val;
-                //outputArea.appendText("arg1 is " + arg1);
+                //System.out.println("arg1 is " + arg1);
                 // arg1 should be a Node 
           /*
                  if (arg1 == null) {
@@ -2149,18 +2160,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
                 Node n = (Node) arg1;
                 double d = 2;
-                // outputArea.appendText ("Moving from " + n.info + n.getClass());
+                // System.out.println ("Moving from " + n.info + n.getClass());
                 while (d > 1 && n != null) {
-                    // outputArea.appendText ("Moving  with d="+ d);
+                    // System.out.println ("Moving  with d="+ d);
                     if (!(n instanceof MetaNode)) {
                         d = d - 1;
                     }
                     n = n.right();
-                    //outputArea.appendText ("Moved to from " + n.info + n.getClass() 
+                    //System.out.println ("Moved to from " + n.info + n.getClass() 
                     //                + "with d="+ d);
                 }
 
-                // outputArea.appendText ("Done moving" + n);
+                // System.out.println ("Done moving" + n);
                 if (n == null) {
                     n = new MetaNode();
                 }
@@ -2189,18 +2200,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
                 Node n = (Node) arg1;
                 double d = ((DoubleVal) arg2).getVal();
-                // outputArea.appendText ("Moving from " + n.info + n.getClass());
+                // System.out.println ("Moving from " + n.info + n.getClass());
                 while (d > 1 && n != null) {
-                    // outputArea.appendText ("Moving  with d="+ d);
+                    // System.out.println ("Moving  with d="+ d);
                     if (!(n instanceof MetaNode)) {
                         d = d - 1;
                     }
                     n = n.right();
-                    //outputArea.appendText ("Moved to from " + n.info + n.getClass() 
+                    //System.out.println ("Moved to from " + n.info + n.getClass() 
                     //                + "with d="+ d);
                 }
 
-                // outputArea.appendText ("Done moving" + n);
+                // System.out.println ("Done moving" + n);
                 return (new StickyNote(n));
             } else if (fname.equals("*length(1)") || fname.equals("*size(1)")) { // return the length of the list 
                 // if it is a list, otherwise return 0
@@ -2227,10 +2238,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             while (call != null && def != null) {
                 if (testType(call, OpVal.parameterOp)) {
                     if (debug) {
-                        outputArea.appendText("Formal parameter is '" + def.left.info.val.toString() + "'");
+                        System.out.println("Formal parameter is '" + def.left.info.val.toString() + "'");
                     }
                     if (debug) {
-                        outputArea.appendText("Actual parameter is '" + evalExpression(call.left) + "'");
+                        System.out.println("Actual parameter is '" + evalExpression(call.left) + "'");
                     }
                     // Loop through ever parameter (ljm: 8/02/04)
                     TreeNode formalParam = (TreeNode) def.left();
@@ -2243,7 +2254,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                         if (testOp(formalParam, OpVal.aliasOp)) {
                             // letIdAliasSN (myScope, formalParam.left().info.val.toString(), evalExpression( actualParam ) );
                             // See if the calling param is an id and is in the scope. If not add it to the scope
-                            //outputArea.appendText("Mapping aliased " + formalParam + " to "+ actualParam);
+                            //System.out.println("Mapping aliased " + formalParam + " to "+ actualParam);
                             if (actualParam.info.val instanceof StringVal) {
                                 StickyNote n = scope.find(actualParam.info.val.toString());  // SN assoc with id
                                 if (n == null) {
@@ -2253,7 +2264,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
                             myScope.alias(formalParam.left().info.val.toString(), evalExpression(actualParam));
                         } else if (testOp(formalParam, OpVal.iteratorOp)) {
-                            //outputArea.appendText("Mapping iterator " + formalParam + " to "+ actualParam);
+                            //System.out.println("Mapping iterator " + formalParam + " to "+ actualParam);
                             StickyNote n = null;
                             if (!(actualParam.info.val instanceof StringVal)) {
                                 printError("Cannot link "
@@ -2261,7 +2272,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                                         + actualParam);
                             } else {
                                 n = scope.searchRef(actualParam.info.val.toString());
-                                //outputArea.appendText("Got n " + n);
+                                //System.out.println("Got n " + n);
                                 if (n == null) {
                                     printError("Cannot link "
                                             + formalParam.left() + " to "
@@ -2269,7 +2280,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                                 }
                             }
 
-                            //outputArea.appendText ( "Aliasing " +formalParam.left().info.val.toString()
+                            //System.out.println ( "Aliasing " +formalParam.left().info.val.toString()
 
                             //+ " to " + n );
                             myScope.alias(formalParam.left().info.val.toString(), n);
@@ -2290,7 +2301,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     if (actualParam != null) {
                         printError("More actual parameters than formal parameters", tn);
                     }
-                    //outputArea.appendText("Passing " + evalExpression(call.left));
+                    //System.out.println("Passing " + evalExpression(call.left));
                 }
                 def = (TreeNode) def.right();
                 call = (TreeNode) call.right();
@@ -2309,7 +2320,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             scope = savedScope;
         }
         if (debug) {
-            outputArea.appendText("Exiting evalFunctionCallOp" + returnVal);
+            System.out.println("Exiting evalFunctionCallOp" + returnVal);
         }
         return returnVal;
     }//end evalFunctionCall
@@ -2361,7 +2372,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     || testOp(pipeline.left.right, OpVal.rangeNxNxN_Op)) {
                 listName = "$temp" + tempNo;
                 StickyNote e1 = evalExpression(pipeline.left.right.left);
-//          outputArea.appendText("Interpreting rangeNxN");
+//          System.out.println("Interpreting rangeNxN");
                 StickyNote e2 = evalExpression(pipeline.left.right.left.right);
                 if (!(e1.val instanceof DoubleVal && e2.val instanceof DoubleVal)) {
                     printError("Cannot iterate from " + e1 + " to " + e2, tn);
@@ -2377,8 +2388,8 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                         printError("Increment in a range must be positive, not" + incr);
                     }
                 }
-                //outputArea.appendText("i1="+i1);
-                //outputArea.appendText("i2="+i2);
+                //System.out.println("i1="+i1);
+                //System.out.println("i2="+i2);
 
                 GenesisList gl = new GenesisList();
                 if (i1 <= i2) {
@@ -2395,7 +2406,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                  }
                  }
                  */
-                //outputArea.appendText("List generated"); gl.displayln();
+                //System.out.println("List generated"); gl.displayln();
                 listName = "$temp" + tempNo;
                 result = scope.alias(gl);
                 letIdNameSN(listName, result);
@@ -2404,7 +2415,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 listName = "$temp" + tempNo;
 
                 StickyNote e1 = evalExpression(pipeline.left.right.left);
-//          outputArea.appendText("Interpreting rangeNxN");
+//          System.out.println("Interpreting rangeNxN");
                 StickyNote e2 = evalExpression(pipeline.left.right.left.right);
                 if (!(e1.val instanceof DoubleVal && e2.val instanceof DoubleVal)) {
                     printError("Cannot iterate from " + e1 + " to " + e2, tn);
@@ -2420,9 +2431,9 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                         printError("Increment in a range must be positive, not" + incr);
                     }
                 }
-                //outputArea.appendText("i1="+i1);
-                //outputArea.appendText("i2="+i2);
-                //outputArea.appendText("incr="+incr);
+                //System.out.println("i1="+i1);
+                //System.out.println("i2="+i2);
+                //System.out.println("incr="+incr);
 
                 GenesisList gl = new GenesisList();
                 if (i1 >= i2) {
@@ -2437,10 +2448,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                  DoubleVal d = new DoubleVal(i);
                  gl.insert(new StickyNote(d));
                  }
-                 // outputArea.appendText("Negative List i2=" + i2 + " i1=" + i1); gl.displayln();
+                 // System.out.println("Negative List i2=" + i2 + " i1=" + i1); gl.displayln();
                  }
                  */
-                //outputArea.appendText("List generated"); gl.displayln();
+                //System.out.println("List generated"); gl.displayln();
                 listName = "$temp" + tempNo;
                 result = scope.alias(gl);
                 letIdNameSN(listName, result);
@@ -2457,7 +2468,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     Node firstNode = Node.str2Node(source);
                     s = new StickyNote(firstNode);
                 }
-                //outputArea.appendText("Got back3");
+                //System.out.println("Got back3");
                 if (s.val instanceof GenesisList) // bizarre patch needed
                 {
                     genesisListFound = true;
@@ -2489,7 +2500,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
                 letIdNameSN(listName, s);
             } else if (testOp(pipeline.left.right, OpVal.stringOp)) {
-                //outputArea.appendText ("Processing a string as a list");
+                //System.out.println ("Processing a string as a list");
                 listName = "$temp" + tempNo;
                 StickyNote s = evalExpression(pipeline.left.right);
 
@@ -2506,12 +2517,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 listName = pipeline.left.right.info.toString(); // list to iterate across
             }
 
-            // outputArea.appendText("evalPipe: listName=" +listName);
+            // System.out.println("evalPipe: listName=" +listName);
             if (genesisListFound) {
                 sn = scope.find(listName); // SN of first node of the list
             } else {
                 sn = scope.search(listName); // SN of first node of the list
-            }          // outputArea.appendText("Evaluating pipeline using " + listName);
+            }          // System.out.println("Evaluating pipeline using " + listName);
             if (sn == null) {  // treat whatever is there as a string and explode it
                 printError("" + evalExpression(pipeline.left.right) + " does not name a list", pipeline.left.right);
             }
@@ -2522,12 +2533,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 sn = new StickyNote(firstNode);
             }
             GenesisVal gv = sn.getVal(); // first node of the list
-            // outputArea.appendText("Evaluating pipeline using " + gv);
+            // System.out.println("Evaluating pipeline using " + gv);
             if (gv != null && !(gv instanceof Node) && !(gv instanceof GenesisList)) {
                 printError("" + listName + " does not name a list " + gv.getClass(), pipeline.left.right);
             }
 
-            //outputArea.appendText ("Interpreting Generate " + iteratorName + " from " + listName);
+            //System.out.println ("Interpreting Generate " + iteratorName + " from " + listName);
             if (gv instanceof GenesisList) {
                 list = (GenesisList) gv;// new GenesisList ((GenesisList)gv);
             } else {
@@ -2538,15 +2549,15 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 // list.printNodes();
             }
 
-            // outputArea.appendText (listName + "=");
+            // System.out.println (listName + "=");
             // Utility.DEBUG = true;
             // list.displayln();
             scope.setIterator(iteratorName, list); //assoc. iteratorName w/ the list
-            //outputArea.appendText("s " + iteratorName + " a GenesisList? ");
-            //outputArea.appendText (scope.search(iteratorName).getVal());
+            //System.out.println("s " + iteratorName + " a GenesisList? ");
+            //System.out.println (scope.search(iteratorName).getVal());
             //GenesisList xxx = (GenesisList) (scope.search(iteratorName).getVal());
-            // outputArea.appendText(""+ (temp  instanceof Iterator ));
-            // outputArea.appendText("terator found");
+            // System.out.println(""+ (temp  instanceof Iterator ));
+            // System.out.println("terator found");
             // Now begin the interpretation
             //Interpret each filter's initialization
             Node guardedFilter = pipeline.right();
@@ -2570,13 +2581,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             // list.reset();
             while (list.on() && condition) {
                 // Interpret each body
-                // outputArea.appendText("Processing filter for: " + list);
+                // System.out.println("Processing filter for: " + list);
                 scope.setIterator(iteratorName, list);
-                // outputArea.appendText("Using iterator" + scope.search(iteratorName));
+                // System.out.println("Using iterator" + scope.search(iteratorName));
                 guardedFilter = pipeline.right;
                 StickyNote current = list.get();
                 while (guardedFilter != null) {
-                    //outputArea.appendText("Calling evalStmt");
+                    //System.out.println("Calling evalStmt");
                     filter = guardedFilter.left.right;
                     Node guard = guardedFilter.left.left;
                     if (guard == null || evalCondition(guard)) {
@@ -2589,29 +2600,29 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 // Don't move if the current node of the list has been modified
                 // due to a deletion of the current node
                 // 
-                // outputArea.appendText ("Iterator is:");
+                // System.out.println ("Iterator is:");
 
                 //list = (GenesisList) scope.searchRef(iteratorName).val;
                 //scope.name(listName,list);
 
                 if (list.on() && list.get() == current) { // ljm: 8/28/04
                     list.move();
-                    // outputArea.appendText("Moving ... current node not modified");
+                    // System.out.println("Moving ... current node not modified");
                 }
                 //else
-                //outputArea.appendText("Not moving ... current node modified");
+                //System.out.println("Not moving ... current node modified");
                 if (cond == null) { // nope, not there
                     condition = true;
                 } else {
                     condition = list.on() && evalCondition(cond.left);
-                    //outputArea.appendText("condition:" + condition);
+                    //System.out.println("condition:" + condition);
                 }
 
-                //outputArea.appendText("Condition is " + condition);
+                //System.out.println("Condition is " + condition);
             }
 
             //Interpret each filter's finalization
-            // outputArea.appendText("Processing finalization");
+            // System.out.println("Processing finalization");
             guardedFilter = pipeline.right;
             while (guardedFilter != null) {
                 filter = guardedFilter.left.right;
@@ -2622,7 +2633,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             //  scope.del(iteratorName);  // ljm: allow for persistence when still on the list
             // Now if the original list was a string, put it back 
             if (!"".equals(stringName)) {
-                //outputArea.appendText("list.pos:" + list.pos());
+                //System.out.println("list.pos:" + list.pos());
                 letIdNameSN(stringName, new StickyNote(list.implode()));
             }
         } else {
@@ -2632,7 +2643,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }//end evalPipe
 
     StickyNote evalWhileStmt(Node tn) {
-        //outputArea.appendText ("Evaluating while statement" + tn.left.right);
+        //System.out.println ("Evaluating while statement" + tn.left.right);
 
         StickyNote result = null;
         Node guardedFilter = tn.left().right();
@@ -2649,11 +2660,11 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         // list.reset();
         while (evalCondition(cond)) {
             // Interpret each body
-            // outputArea.appendText("Processing filter for: " + list);
-            // outputArea.appendText("Using iterator" + scope.search(iteratorName));
+            // System.out.println("Processing filter for: " + list);
+            // System.out.println("Using iterator" + scope.search(iteratorName));
             guardedFilter = tn.left.right;
             while (guardedFilter != null) {
-                //outputArea.appendText("Calling evalStmt");
+                //System.out.println("Calling evalStmt");
                 filter = guardedFilter.left.right;
                 Node guard = guardedFilter.left.left;
                 if (guard == null || evalCondition(guard)) {
@@ -2664,7 +2675,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         }
 
         //Interpret each filter's finalization
-        // outputArea.appendText("Processing finalization");
+        // System.out.println("Processing finalization");
         guardedFilter = tn.left().right;
         while (guardedFilter != null) {
             filter = guardedFilter.left.right;
@@ -2677,7 +2688,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     @SuppressWarnings({"empty-statement", "empty-statement"})
     StickyNote evalUserPipe(Node tn) {
         if (debug) {
-            outputArea.appendText("Entering evalUserPipe with " + tn);
+            System.out.println("Entering evalUserPipe with " + tn);
         }
         StickyNote returnVal = null;  // To store the returned value
         StickyNote result = null;
@@ -2687,7 +2698,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             // first, build the mangled name and collect the parameters
             String fname = buildMangledFunctionCallName(pipeline);
             if (debug) {
-                outputArea.appendText("fname = " + fname);
+                System.out.println("fname = " + fname);
             }
             // now, set up scope
             //
@@ -2701,23 +2712,23 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             Node call = tn.left().left; // skip to the generator invocation
             //debug=true;
             if (debug) {
-                outputArea.appendText("Grabbing definition for  " + fname);
+                System.out.println("Grabbing definition for  " + fname);
             }
 
             // next, grab the definition
             StickyNote temp = scope.name(fname);
             // temp refers to the subtree rooted at generatorDefOp
-            // outputArea.appendText("Got back");
+            // System.out.println("Got back");
             if (temp == null) {
                 printError("The function " + fname + " has not been defined", tn);
             }
             Node def = (Node) (temp.val);
 
             if (debug) {
-                outputArea.appendText("1. Got to here with fname=" + fname);
+                System.out.println("1. Got to here with fname=" + fname);
             }
             if (debug) {
-                outputArea.appendText("def is " + def.info + def.info.getClass());
+                System.out.println("def is " + def.info + def.info.getClass());
             }
 
             def = def.left().left(); //skip to the function signature
@@ -2726,10 +2737,10 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             while (call != null && def != null) {
                 if (testType(call, OpVal.parameterOp)) {
                     if (debug) {
-                        outputArea.appendText("Formal parameter is '" + def.left.info.val.toString() + "'");
+                        System.out.println("Formal parameter is '" + def.left.info.val.toString() + "'");
                     }
                     if (debug) {
-                        outputArea.appendText("Actual parameter is '" + evalExpression(call.left) + "'");
+                        System.out.println("Actual parameter is '" + evalExpression(call.left) + "'");
                     }
                     // Loop through ever parameter (ljm: 8/02/04)
                     TreeNode formalParam = (TreeNode) def.left();
@@ -2763,14 +2774,14 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     if (actualParam != null) {
                         printError("More actual parameters than formal parameters", tn);
                     }
-                    //outputArea.appendText("Passing " + evalExpression(call.left));
+                    //System.out.println("Passing " + evalExpression(call.left));
                 }
                 def = (TreeNode) def.right();
                 call = (TreeNode) call.right();
             }
             // Now, we should have all the parameters linked.
             if (debug) {
-                outputArea.appendText("Parameters matched");
+                System.out.println("Parameters matched");
             }
             Scope saveScope;
             boolean condition;  // Should we keep going?
@@ -2785,16 +2796,16 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             while (itercond != null && !testOp(itercond, OpVal.whileOp)) {
                 itercond = itercond.right;
                 if (debug) {
-                    outputArea.appendText("Evaling in loop:" + itercond);
+                    System.out.println("Evaling in loop:" + itercond);
                 }
             }
 
             if (debug) {
-                outputArea.appendText("Parameters matched");
+                System.out.println("Parameters matched");
             }
             // 1. Execute the generator's initialization
             if (debug) {
-                outputArea.appendText("Generator @first");
+                System.out.println("Generator @first");
             }
             def = (Node) (temp.val);
             Scope savedScope = scope;
@@ -2806,7 +2817,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             // Now begin the interpretation
             //Interpret each filter's initialization
             if (debug) {
-                outputArea.appendText("Task:init");
+                System.out.println("Task:init");
             }
             Node guardedFilter = pipeline.right();
             Node filter;
@@ -2818,13 +2829,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
             // 3. Run the generator's "Are we done?" code
             if (debug) {
-                outputArea.appendText("Generator @last");
+                System.out.println("Generator @last");
             }
             savedScope = scope;  // save the scope
             scope = myScope;
             StickyNote cond = evalStmt(genlast);
             if (debug) {
-                outputArea.appendText("@last truth value" + cond);
+                System.out.println("@last truth value" + cond);
             }
             if (!(cond.val instanceof TruthVal)) {
                 printError("@last in a generator must return a truth value", genlast);
@@ -2832,7 +2843,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             condition = ((TruthVal) cond.val).val;
             scope = savedScope;  // restore scope
             if (debug) {
-                outputArea.appendText("Generator condition = " + condition);
+                System.out.println("Generator condition = " + condition);
             }
 
             // 4. Evaluate the condition in the global environment
@@ -2844,22 +2855,22 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 }
             }
             if (debug) {
-                outputArea.appendText("Iteration condition = " + condition);
+                System.out.println("Iteration condition = " + condition);
             }
 
             // 5.   if not, then run each task's iteration code and
             //continue with step 3
             if (debug) {
-                outputArea.appendText("Iterator @iter");
+                System.out.println("Iterator @iter");
             }
             // Interpret each body, while iterating 
             int i = 1;
             while (condition) {
                 // Interpret each body
-                // outputArea.appendText("Processing filter for: " + list);
+                // System.out.println("Processing filter for: " + list);
                 guardedFilter = pipeline.right;
                 while (guardedFilter != null) {
-                    //outputArea.appendText("Calling evalStmt");
+                    //System.out.println("Calling evalStmt");
                     filter = guardedFilter.left.right;
                     Node guard = guardedFilter.left.left;
                     if (guard == null || evalCondition(guard)) {
@@ -2872,18 +2883,18 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 evalStmt(geniter);
                 scope = savedScope;
                 if (debug) {
-                    outputArea.appendText("Evaluating condition");
+                    System.out.println("Evaluating condition");
                 }
                 // Check to see if were done ... same as code before the loop
                 // 3. Run the generator's "Are we done?" code
                 if (debug) {
-                    outputArea.appendText("Generator @last");
+                    System.out.println("Generator @last");
                 }
                 savedScope = scope;  // save the scope
                 scope = myScope;
                 cond = evalStmt(genlast);
                 if (debug) {
-                    outputArea.appendText("@last truth value" + cond);
+                    System.out.println("@last truth value" + cond);
                 }
                 if (!(cond.val instanceof TruthVal)) {
                     printError("@last in a generator must return a truth value", genlast);
@@ -2891,7 +2902,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                 condition = ((TruthVal) cond.val).val;
                 scope = savedScope;  // restore scope
                 if (debug) {
-                    outputArea.appendText("Generator condition = " + condition);
+                    System.out.println("Generator condition = " + condition);
                 }
 
                 // 4. Evaluate the condition in the global environment
@@ -2903,12 +2914,12 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
                     }
                 }
                 if (debug) {
-                    outputArea.appendText("Iteration condition = " + condition);
+                    System.out.println("Iteration condition = " + condition);
                 }
             }
 
             //Interpret each filter's finalization
-            // outputArea.appendText("Processing finalization");
+            // System.out.println("Processing finalization");
             guardedFilter = pipeline.right;
             while (guardedFilter != null) {
                 filter = guardedFilter.left.right;
@@ -2922,13 +2933,13 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     }//end evalPipe
 
     Node traverse(Node root, Node key) {
-        // outputArea.appendText("Traversing " + new StickyNote(root) + " " + root);
-        // outputArea.appendText("Looking for " + new StickyNote(key) + " "  + key);
+        // System.out.println("Traversing " + new StickyNote(root) + " " + root);
+        // System.out.println("Looking for " + new StickyNote(key) + " "  + key);
         Node n = root;
         Node result = null;
         while (n != null) {
             GenesisVal gv = n.info.getVal();
-            // outputArea.appendText("Looping through  " + new StickyNote(n));
+            // System.out.println("Looping through  " + new StickyNote(n));
             if (gv instanceof Node) {
                 if (((Node) gv) == key) {
                     return (Node) n;
@@ -2941,7 +2952,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
             }
             n = n.right;
         }
-        // outputArea.appendText("Returning " + result);
+        // System.out.println("Returning " + result);
         return result;
     }//end traverse
 
@@ -2952,7 +2963,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         Node exp = tn.left;
         StickyNote expVal = new StickyNote(evalExpression(exp));
         // String iter = tn.left.right.getVal().toString();   // iterator to use for the position
-        //outputArea.appendText("insert " + expVal + " before ");
+        //System.out.println("insert " + expVal + " before ");
         GenesisList current = evalRef(tn.left.right);
         //current.prev();
         current.insert(expVal);
@@ -2960,8 +2971,8 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
          if (expVal.getLabel() == null )
          current.insert(expVal);
          else {
-         // outputArea.appendText("label is " + exp.getLabel());
-         // outputArea.appendText("expVal is " + expVal);
+         // System.out.println("label is " + exp.getLabel());
+         // System.out.println("expVal is " + expVal);
          current.insert( expVal, getLabel(exp) );
          }
          */
@@ -2982,15 +2993,15 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         GenesisList current = evalRef(exp.right);
         StickyNote expVal = new StickyNote(evalExpression(exp));
         // String iter = tn.left.right.getVal().toString();   // iterator to use for the position
-        //outputArea.appendText("insert " + expVal + " after ");
+        //System.out.println("insert " + expVal + " after ");
         current.move();
         current.insert(expVal);
         /* 
          if (exp.getLabel() == null )
          current.insert(expVal);
          else {
-         // outputArea.appendText("label is " + exp.getLabel());
-         // outputArea.appendText("expVal is " + expVal);
+         // System.out.println("label is " + exp.getLabel());
+         // System.out.println("expVal is " + expVal);
          current.insert( expVal, getLabel(exp) );
          }
          */
@@ -3003,23 +3014,23 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
     StickyNote evalDelete(Node tn) {
         // debug = true;
         if (debug) {
-            outputArea.appendText("Calling Delete with");
+            System.out.println("Calling Delete with");
             Parser.prettyPrint((TreeNode) tn);
         }
         GenesisList current = evalRef(tn.left);
 
-        // outputArea.appendText("Before deleteing");
-        // outputArea.appendText("current.parent().addr() = " + current.parent().addr());
-        // outputArea.appendText("current.current().val.addr() = " + current.current().addr());
+        // System.out.println("Before deleteing");
+        // System.out.println("current.parent().addr() = " + current.parent().addr());
+        // System.out.println("current.current().val.addr() = " + current.current().addr());
         //current.displayln();
         // String iter = tn.left.right.getVal().toString();   // iterator to use for the position
         // current.displayln();
         current.del();
-        // outputArea.appendText("After deleteing");
+        // System.out.println("After deleteing");
         // current.displayln();
-        // outputArea.appendText("l's val.addr() = " + scope.search("l").val.addr());
-        // outputArea.appendText("current.parent().addr() = " + current.parent().addr());
-        // outputArea.appendText("current.current().val.addr() = " + current.current().addr());
+        // System.out.println("l's val.addr() = " + scope.search("l").val.addr());
+        // System.out.println("current.parent().addr() = " + current.parent().addr());
+        // System.out.println("current.current().val.addr() = " + current.current().addr());
         // current.displayln();
         // if (tn.left
         return null;
@@ -3049,7 +3060,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         StickyNote expVal = new StickyNote(evalExpression(exp));
         GenesisList current = evalRef(lst);
         StickyNote mycurrent = evalExpression(lst);
-        // outputArea.appendText("Appending " + expVal + " onto "); current.displayln();
+        // System.out.println("Appending " + expVal + " onto "); current.displayln();
         if (current.on()) { // list-exp is subscripted 
             // or accessed through an iterator
             StickyNote sn = current.get();
@@ -3064,16 +3075,16 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         while (current.on()) {
             current.move();
         }  // move to end of list
-        //outputArea.appendText("Appending " + expVal + " onto " + mycurrent);
+        //System.out.println("Appending " + expVal + " onto " + mycurrent);
         //GenesisVal label = expVal.getLabel();
-        // outputArea.appendText ("evalAppend: appending " + expVal.getLabel() + expVal);
+        // System.out.println ("evalAppend: appending " + expVal.getLabel() + expVal);
         current.insert(expVal);  // insert it with or without label
      /*
          if (label == null )
          current.insert(expVal);
          else {
-         // outputArea.appendText("label is " + exp.getLabel());
-         // outputArea.appendText("expVal is " + expVal);
+         // System.out.println("label is " + exp.getLabel());
+         // System.out.println("expVal is " + expVal);
          current.insert( expVal, getLabel(exp) );
          }
          */
@@ -3092,7 +3103,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
         StickyNote expVal = new StickyNote(evalExpression(exp));
         GenesisList current = evalRef(lst); // node of the list
 
-        // outputArea.appendText("Prepending " + expVal + " onto "); current.displayln();
+        // System.out.println("Prepending " + expVal + " onto "); current.displayln();
         if (current.on()) { // list-exp is subscripted 
             // or accessed through an iterator
             StickyNote sn = current.get();
@@ -3124,19 +3135,19 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
      // String iter = tn.left.right.getVal().toString();   // iterator to use for the position
      GenesisList current = evalRef(tn.left.right);
      current.reset();
-     // outputArea.appendText("insert " + expVal + " before " + current );
+     // System.out.println("insert " + expVal + " before " + current );
      //current.move();
      //current.prev();
      if (exp.getLabel() == null )
      current.insert(expVal);
      else {
-     // outputArea.appendText("label is " + exp.getLabel());
-     // outputArea.appendText("expVal is " + expVal);
+     // System.out.println("label is " + exp.getLabel());
+     // System.out.println("expVal is " + expVal);
      current.insert( expVal, exp.getLabel() );
      }
      //current.move();
-     // outputArea.appendText("Gives " + current );
-     // outputArea.appendText("Gives " + tn.left.right );
+     // System.out.println("Gives " + current );
+     // System.out.println("Gives " + tn.left.right );
      current.reset();
      letIdNameSN(tn.left.right.toString(),new StickyNote(current.current()));
   
@@ -3144,7 +3155,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
      return expVal;
      */
     void evalStop(Node tn) {
-        outputArea.appendText("Stop statement encountered at line "
+        System.out.println("Stop statement encountered at line "
                 + ((TreeNode) tn).context.lineNo);
         System.exit(0);
     }//end evalStop
@@ -3153,7 +3164,7 @@ public class Evaluator extends GenesisDevelopmentEnvironmentViewController{
 
         if (debug) {
             Parser.prettyPrint((TreeNode) tn);
-            outputArea.appendText("Unaliasing " + tn.left.info.toString());
+            System.out.println("Unaliasing " + tn.left.info.toString());
         }
         return scope.del(tn.left.info.toString());
     }//end evalUnalias

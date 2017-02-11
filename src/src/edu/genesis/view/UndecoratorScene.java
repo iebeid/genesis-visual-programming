@@ -109,12 +109,12 @@ public class UndecoratorScene extends Scene {
     }
 
     public void setBackgroundStyle(String style) {
-        undecorator.getBackground().setStyle(style);
+        undecorator.getBackgroundRectangle().setStyle(style);
     }
 
     public void setBackgroundPaint(Paint paint) {
         undecorator.removeDefaultBackgroundStyleClass();
-        undecorator.getBackground().setFill(paint);
+        undecorator.getBackgroundRectangle().setFill(paint);
     }
 
     public Undecorator getUndecorator() {

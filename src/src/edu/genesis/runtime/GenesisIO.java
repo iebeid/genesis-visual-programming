@@ -5,14 +5,23 @@
 package edu.genesis.runtime;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class GenesisIO {
 
     private LineNumberReader in;
     private PrintWriter out;
-
+PrintStream o;
     // standard constructor: uses stdin and stdout
     public GenesisIO(String infile, String outfile) {
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         try {
             if (!infile.equals("")) {
                 in = new LineNumberReader(new FileReader(infile), 1000);

@@ -7,6 +7,8 @@
 package edu.genesis.runtime;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class PascalTextReader {
 
@@ -16,8 +18,17 @@ class PascalTextReader {
     private int ch; // to hold the next character to read
     private boolean eoln; // whether the last char a line has been read
     private boolean eof;  // whether the last char of the file has been read
+    PrintStream o;
 
     PascalTextReader() {
+                
+                        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         infileName = "";
         infile = new BufferedReader(new InputStreamReader(System.in));
         eoln = true;
@@ -25,6 +36,14 @@ class PascalTextReader {
     }
 
     PascalTextReader(String fileName) {
+                
+                        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisVal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
         infileName = fileName;
         try {
             if (infileName.equals("")) {

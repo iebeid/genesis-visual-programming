@@ -4,11 +4,17 @@
  */
 package edu.genesis.runtime;
 
-import edu.genesis.view.GenesisDevelopmentEnvironmentViewController;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,7 +32,7 @@ import org.w3c.dom.Element;
  *
  * @author Laptop
  */
-public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
+public class EvaluatorXML {
     // Evaluator.java
 // Wes Potts/Larry Morell/Surya Muntha
 // 6/9/2004 
@@ -119,6 +125,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     DocumentBuilder docBuilder;
     Element rootElement;
     Document doc;
+    PrintStream o;
     private void init() {
         /* Add built-in function calls to the scope */
         scope.setName("*integer(1)", new TreeNode("function"));
@@ -165,11 +172,19 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
         inf.right = new Node(1, inf, null);
         inf.right.right = inf.right;  // create circular list
         scope.setName("infinity", inf);
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(EvaluatorXML.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     public EvaluatorXML() {
         scope = new Scope();
         init();
+        
     }
     // Instances of GenesisVal's to use in testType and testOp
     private final StringVal STRING_VAL = new StringVal("");
@@ -201,16 +216,16 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     }
 
     public static void printError(String msg, TreeNode tn) {
-        System.err.println("");
+        System.out.println("");
         if (tn != null) {
-            System.err.println("> In file '"
+            System.out.println("> In file '"
                     + tn.fileName()
                     + "' error occurred on or about line "
                     + tn.lineNo()
                     + ", column "
                     + tn.charPos()
                     + ".");
-            outputArea.appendText("> In file '"
+            System.out.println("> In file '"
                     + tn.fileName()
                     + "' error occurred on or about line "
                     + tn.lineNo()
@@ -218,22 +233,22 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                     + tn.charPos()
                     + ". \n");
         } else {
-            System.err.println("> Error occurred.");
-            outputArea.appendText("> Error occurred. \n");
+            System.out.println("> Error occurred.");
+            System.out.println("> Error occurred. \n");
         }
-        System.err.println("> " + msg);
-        outputArea.appendText("> " + msg);
+        System.out.println("> " + msg);
+        System.out.println("> " + msg);
         while (tn != null && tn.lineNo() == 0) {
             tn = (TreeNode) tn.left;
         }
-        System.err.println("> Stopping algorithm.");
-        outputArea.appendText("> Stopping algorithm. \n");
-        System.err.println("");
-        outputArea.appendText("\n");
-        System.err.println("Done interpreting program\n--------------\n");
-        outputArea.appendText("Done interpreting program\n--------------\n");
-        System.err.println("\"" + Quote.getMessage() + "\"");
-        outputArea.appendText("\"" + Quote.getMessage() + "\"");
+        System.out.println("> Stopping algorithm.");
+        System.out.println("> Stopping algorithm. \n");
+        System.out.println("");
+        System.out.println("\n");
+        System.out.println("Done interpreting program\n--------------\n");
+        System.out.println("Done interpreting program\n--------------\n");
+        System.out.println("\"" + Quote.getMessage() + "\"");
+        System.out.println("\"" + Quote.getMessage() + "\"");
         System.exit(1);
     }
 
@@ -284,8 +299,8 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             } else if (testType(tn, OpVal.stopStmtOp)
                     && testOp(tn, OpVal.stopStmtOp)) {  // special case 
                 if (trace) {
-                    outputArea.appendText("==> Executing: \n");
-                    outputArea.appendText(tn + "\n");  // will invoke toString, a pretty printer
+                    System.out.println("==> Executing: \n");
+                    System.out.println(tn + "\n");  // will invoke toString, a pretty printer
                 }
                 evalStop(tn);
             } else {
@@ -328,20 +343,20 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
     StickyNote evalStmt(Node tn) {
         if (autotrace && !testOp(tn, OpVal.stmtListOp)) {
-            outputArea.appendText("==>"); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
-            outputArea.appendText(tn + "\n");  // will invoke toString, a pretty printer
+            System.out.println("==>"); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
+            System.out.println(tn + "\n");  // will invoke toString, a pretty printer
         } else if (trace && !testOp(tn, OpVal.stmtListOp)) {
             // Check to see if Vector contains the current line number
             if (stopAt.contains(new Integer(((TreeNode) tn).prettyNo()))
                     || stopAt.contains(0)) {
                 Scope s = scope;
-                outputArea.appendText("==> "); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
-                outputArea.appendText(tn + "");  // will invoke toString, a pretty printer
+                System.out.println("==> "); // Executing instruction:"+ ((TreeNode) tn).prettyNo());
+                System.out.println(tn + "");  // will invoke toString, a pretty printer
                 int x;
                 boolean doAgain = true;
                 Scanner scanner = new Scanner(System.in);
                 while (doAgain) {
-                    outputArea.appendText("> ");
+                    System.out.println("> ");
                     try {
                         x = System.in.read();
                         if (x >= 0) {
@@ -349,32 +364,32 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                             if (ch == 'n') {
                                 doAgain = false;
                             } else if (ch == 'L') {
-                                outputArea.appendText(root + "\n");  // will invoke toString, a pretty printer
+                                System.out.println(root + "\n");  // will invoke toString, a pretty printer
                             } else if (ch == 'l') {
                                 TreeNode context = findContext(tn);
-                                outputArea.appendText(context + "\n");  // will invoke toString, a pretty printer
+                                System.out.println(context + "\n");  // will invoke toString, a pretty printer
                             } else if (ch == '.') {
-                                outputArea.appendText(tn + "\n");  // will invoke toString, a pretty printer
+                                System.out.println(tn + "\n");  // will invoke toString, a pretty printer
                             } else if (ch == 'q') {
-                                outputArea.appendText("Stopping ... \n");  // will invoke toString, a pretty printer
+                                System.out.println("Stopping ... \n");  // will invoke toString, a pretty printer
                                 System.exit(0);
                             } else if (ch == '?') {
-                                outputArea.appendText("\n>[n,h,.,l,L,p,q,r,s?]: ");
+                                System.out.println("\n>[n,h,.,l,L,p,q,r,s?]: ");
                             } else if (ch == 'p') {
                                 String id = scanner.next();
                                 StickyNote n = scope.alias(id);  // SN assoc with id
                                 if (n == null) {
-                                    outputArea.appendText(id + ": " + "no value associated with '" + id + "' \n");
+                                    System.out.println(id + ": " + "no value associated with '" + id + "' \n");
                                 } else {
-                                    outputArea.appendText(id + ": " + n + "\n");
+                                    System.out.println(id + ": " + n + "\n");
                                 }
                             } else if (ch == 's') {
                                 int len = stopAt.size();
-                                outputArea.appendText("\nBreakpoint(s): ");
+                                System.out.println("\nBreakpoint(s): ");
                                 for (int i = 0; i < len; i++) {
-                                    outputArea.appendText("" + stopAt.get(i) + ' ');
+                                    System.out.println("" + stopAt.get(i) + ' ');
                                 }
-                                outputArea.appendText("\n\nSet which breakpoint? ");
+                                System.out.println("\n\nSet which breakpoint? ");
                                 Integer bp = scanner.nextInt();
                                 int pos = stopAt.indexOf(bp);
                                 if (pos == -1) {
@@ -382,34 +397,34 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                                 }
                             } else if (ch == 'r') {
                                 int len = stopAt.size();
-                                outputArea.appendText("\nBreakpoint(s): ");
+                                System.out.println("\nBreakpoint(s): ");
                                 for (int i = 0; i < len; i++) {
-                                    outputArea.appendText("" + stopAt.get(i) + ' ');
+                                    System.out.println("" + stopAt.get(i) + ' ');
                                 }
-                                outputArea.appendText("\n\nDelete which breakpoint? ");
+                                System.out.println("\n\nDelete which breakpoint? ");
                                 Integer del = scanner.nextInt();
                                 int pos = stopAt.indexOf(del);
                                 if (pos >= 0) {
                                     stopAt.removeElementAt(pos);
                                 }
                             } else if (ch == 'h') {
-                                outputArea.appendText("Input         Meaning\n");
-                                outputArea.appendText("-----         -------\n");
-                                outputArea.appendText("  p label  Display the value associated with 'label'\n");
-                                outputArea.appendText("  n        Advance to next breakpoint\n");
-                                outputArea.appendText("  h        Print this help\n");
-                                outputArea.appendText("  .        List the current instruction\n");
-                                outputArea.appendText("  l        List the containing procedure or function\n");
-                                outputArea.appendText("  L        List the whole algorithm\n");
-                                outputArea.appendText("  q        Quit\n");
-                                outputArea.appendText("  r        Remove breakpoint(s)\n");
-                                outputArea.appendText("  s        Set breakpoint(s)\n");
-                                outputArea.appendText("  ?        Print short help\n");
+                                System.out.println("Input         Meaning\n");
+                                System.out.println("-----         -------\n");
+                                System.out.println("  p label  Display the value associated with 'label'\n");
+                                System.out.println("  n        Advance to next breakpoint\n");
+                                System.out.println("  h        Print this help\n");
+                                System.out.println("  .        List the current instruction\n");
+                                System.out.println("  l        List the containing procedure or function\n");
+                                System.out.println("  L        List the whole algorithm\n");
+                                System.out.println("  q        Quit\n");
+                                System.out.println("  r        Remove breakpoint(s)\n");
+                                System.out.println("  s        Set breakpoint(s)\n");
+                                System.out.println("  ?        Print short help\n");
                             }
                             scanner.nextLine();
                         }
                     } catch (IOException io) {
-                        outputArea.appendText("IOerror:" + io + "\n");
+                        System.out.println("IOerror:" + io + "\n");
                     }
                 }
             }
@@ -483,7 +498,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             }
         } else {
             if (debug) {
-                outputArea.appendText("Assigning " + id + "-to-" + sn + " of type " + sn.val.getClass() + "\n");
+                System.out.println("Assigning " + id + "-to-" + sn + " of type " + sn.val.getClass() + "\n");
             }
 
             scope.setName(id, sn);
@@ -499,7 +514,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
     StickyNote evalIdNameValue(Node tn, StickyNote result) {
         if (autotrace) {
-            outputArea.appendText(tn.left() + ": " + result + "\n");
+            System.out.println(tn.left() + ": " + result + "\n");
         }
         if (testType(tn.left(), STRING_VAL)) {
             StickyNote sn = tn.left().info;
@@ -764,7 +779,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     GenesisList evalRef(Node tn) {
         GenesisList result = null;
         if (debug) {
-            outputArea.appendText("Evaluating reference expression: \n");
+            System.out.println("Evaluating reference expression: \n");
             Parser.prettyPrint((TreeNode) tn);
         }
         // if the expression is an identifier, return an alias to it
@@ -777,7 +792,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 result = new GenesisList();  // Very speculative
             } else {
                 if (debug) {
-                    outputArea.appendText("Value/class of expression is " + n.val + "" + n.val.getClass() + "\n");
+                    System.out.println("Value/class of expression is " + n.val + "" + n.val.getClass() + "\n");
                 }
                 if (!(n.val instanceof GenesisList)
                         && !(n.val instanceof Node)
@@ -787,7 +802,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 if (n.val instanceof GenesisList) {
                     result = (GenesisList) n.val;
                     if (debug) {
-                        outputArea.appendText("n.val is a GenesisList" + n.val + "\n");
+                        System.out.println("n.val is a GenesisList" + n.val + "\n");
                     }
              if (xml) {
            	Element define = doc.createElement("define");
@@ -838,7 +853,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             return null;
         }
         if (debug) {
-            outputArea.appendText("evalRef returns " + result + "/" + result.getClass() + "\n");
+            System.out.println("evalRef returns " + result + "/" + result.getClass() + "\n");
         }
         return result;
     }
@@ -847,7 +862,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     {
         StickyNote result;
         if (debug) {
-            outputArea.appendText("Evaluating expression: " + "\n");
+            System.out.println("Evaluating expression: " + "\n");
             Parser.prettyPrint((TreeNode) tn);
         }
         // if the expression is an identifier, return an alias to it
@@ -855,7 +870,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             String id = tn.info.toString();
             StickyNote n = scope.find(id);  // SN assoc with id
             if (debug) {
-                outputArea.appendText("evalExp returning:" + n.toString() + "\n");
+                System.out.println("evalExp returning:" + n.toString() + "\n");
             }
 //            if (xml) {
 //           	Element define = doc.createElement("define");
@@ -938,7 +953,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             return null;
         }
         if (debug) {
-            outputArea.appendText("evalExpression returns " + result + "\n");
+            System.out.println("evalExpression returns " + result + "\n");
         }
         return result;
     } // evalExp
@@ -946,7 +961,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     StickyNote evalExpression(Node tn) {
         StickyNote result;
         if (debug) {
-            outputArea.appendText("Evaluating expression: " + "\n");
+            System.out.println("Evaluating expression: " + "\n");
             Parser.prettyPrint((TreeNode) tn);
         }
         // if the expression is an identifier, return an alias to it
@@ -1019,7 +1034,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             return null;
         }
         if (debug) {
-            outputArea.appendText("Expression value:" + result + "type: " + result.val.getClass() + "\n");
+            System.out.println("Expression value:" + result + "type: " + result.val.getClass() + "\n");
         }
         return result;
     } // evalExpression
@@ -1199,14 +1214,14 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             tn = tn.right();
         }
         if (debug) {
-            outputArea.appendText("evalListOp returning " + l + "\n");
+            System.out.println("evalListOp returning " + l + "\n");
         }
         if (debug) {
-            outputArea.appendText("Expression value:" + l + "type: " + l.getClass() + "\n");
+            System.out.println("Expression value:" + l + "type: " + l.getClass() + "\n");
         }
         StickyNote stickynote = scope.alias(l);
         if (debug) {
-            outputArea.appendText("Expression value:" + stickynote + "type: " + stickynote.val.getClass() + "\n");
+            System.out.println("Expression value:" + stickynote + "type: " + stickynote.val.getClass() + "\n");
         }
 //        if (xml) {
 //           	Element define = doc.createElement("define");
@@ -1241,7 +1256,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
     StickyNote evalSelect(Node tn) {
         if (debug) {
-            outputArea.appendText("Executing Select \n");
+            System.out.println("Executing Select \n");
             Parser.prettyPrint((TreeNode) tn);
         }
         Node cond, stmt;
@@ -1331,7 +1346,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     }//end evalCondition
 
     StickyNote evalEmit(Node tn) {
-        outputArea.appendText("Emit not implemented \n");
+        System.out.println("Emit not implemented \n");
         return null;
     }//end evalEmit
 
@@ -1361,7 +1376,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
     StickyNote evalPrint(Node tn) {
         if (debug) {
-            outputArea.appendText("Executing evalPrint \n");
+            System.out.println("Executing evalPrint \n");
             Parser.prettyPrint((TreeNode) tn);
         }
         StickyNote sn = evalEcho(tn, true);
@@ -1420,7 +1435,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             } else if (testType(n, OpVal.whileOp)) {
                 n = n.right();
             } else {
-                outputArea.appendText("In mangledDefName: NOT SUPPOSED TO BE HERE: " + fname + "\n");
+                System.out.println("In mangledDefName: NOT SUPPOSED TO BE HERE: " + fname + "\n");
             }
         }
         return fname;
@@ -1428,12 +1443,12 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
     StickyNote evalFunctionDef(Node tn) {
         if (debug) {
-            outputArea.appendText("Executing evalFunctionDef \n");
+            System.out.println("Executing evalFunctionDef \n");
             Parser.prettyPrint((TreeNode) tn);
         }
         String name = buildMangledDefName(tn);
         if (autotrace) {
-            outputArea.appendText("Defining:" + name + "\n");
+            System.out.println("Defining:" + name + "\n");
         }
         // first, build the mangled function name
         // then, just "name" it
@@ -1463,7 +1478,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             } else if (testType(n, OpVal.whileOp)) { //skip
                 n = n.right();
             } else {
-                outputArea.appendText("In buildMangledFunctionCallName: NOT SUPPOSED TO BE HERE" + n.getVal() + "\n");
+                System.out.println("In buildMangledFunctionCallName: NOT SUPPOSED TO BE HERE" + n.getVal() + "\n");
                 System.exit(1);
             }
         }
@@ -1473,18 +1488,18 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     StickyNote evalFunctionCall(Node tn) {
         stmtCount++;
         if (debug) { // && ! testOp ( tn, OpVal.stmtListOp)) 
-            outputArea.appendText("Executing evalFunctionCall: \n");
+            System.out.println("Executing evalFunctionCall: \n");
             Parser.prettyPrint((TreeNode) tn);
         }
         StickyNote returnVal = null;  // To store the returned value
         // first, build the mangled name and collect the parameters
         String fname = buildMangledFunctionCallName(tn);
         if (autotrace) {
-            outputArea.appendText("Calling:" + fname);
+            System.out.println("Calling:" + fname);
             autoindent = autoindent + 4;
         }
         if (debug) {
-            outputArea.appendText("fname = " + fname);
+            System.out.println("fname = " + fname);
         }
         // now, set up scope
         //
@@ -1496,7 +1511,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
         // grab the call 
         Node call = tn.left(); // skip to the function invocation
         if (debug) {
-            outputArea.appendText("Grabbing definition for  " + fname + "\n");
+            System.out.println("Grabbing definition for  " + fname + "\n");
         }
         // next, grab the definition
         // First check to see if it is a built-in function or procedure
@@ -1509,14 +1524,14 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
         Node def = (Node) (scope.name(fname).val);
 
         if (debug) {
-            outputArea.appendText("Got to here with fname=" + fname + "\n");
+            System.out.println("Got to here with fname=" + fname + "\n");
         }
         if (debug) {
-            outputArea.appendText("def is " + def.info + def.info.getClass() + "\n");
+            System.out.println("def is " + def.info + def.info.getClass() + "\n");
         }
         if (def.info.val.toString().equals("procedure")) {  // built-in procedure
             if (debug) {
-                outputArea.appendText("Calling builtin procedure " + fname + "\n");
+                System.out.println("Calling builtin procedure " + fname + "\n");
             }
 
             if (fname.equals("*move(1)") || fname.equals("*move(1)forward")) {
@@ -1669,7 +1684,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             returnVal = new StickyNote();
         } else if (def.info.val.toString().equals("function")) {  // built-in function
             if (debug) {
-                outputArea.appendText("Calling builtin function " + fname + "\n");
+                System.out.println("Calling builtin function " + fname + "\n");
             }
             if (fname.equals("*integer(1)")) {
                 GenesisVal argument = evalExpression(call.right.left).val;
@@ -1889,7 +1904,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 }
             } else if (fname.equals("*iterator(1)")) {
                 if (debug) {
-                    outputArea.appendText("Processing iterator(" + call.right.left.info.val.toString() + ")\n");
+                    System.out.println("Processing iterator(" + call.right.left.info.val.toString() + ")\n");
                 }
                 if (call.right.left.info.val instanceof StringVal) {
                     /*
@@ -2092,10 +2107,10 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             while (call != null && def != null) {
                 if (testType(call, OpVal.parameterOp)) {
                     if (debug) {
-                        outputArea.appendText("Formal parameter is '" + def.left.info.val.toString() + "' \n");
+                        System.out.println("Formal parameter is '" + def.left.info.val.toString() + "' \n");
                     }
                     if (debug) {
-                        outputArea.appendText("Actual parameter is '" + evalExpression(call.left) + "' \n");
+                        System.out.println("Actual parameter is '" + evalExpression(call.left) + "' \n");
                     }
                     // Loop through ever parameter (ljm: 8/02/04)
                     TreeNode formalParam = (TreeNode) def.left();
@@ -2453,7 +2468,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     StickyNote evalUserPipe(Node tn) {
         stmtCount++;
         if (debug) {
-            outputArea.appendText("Entering evalUserPipe with " + tn + "\n");
+            System.out.println("Entering evalUserPipe with " + tn + "\n");
         }
         StickyNote returnVal = null;  // To store the returned value
         StickyNote result = null;
@@ -2462,7 +2477,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             // first, build the mangled name and collect the parameters
             String fname = buildMangledFunctionCallName(pipeline);
             if (debug) {
-                System.err.println("fname = " + fname);
+                System.out.println("fname = " + fname);
             }
             // now, set up scope
             //
@@ -2475,7 +2490,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             // grab the call 
             Node call = tn.left().left; // skip to the generator invocation
             if (debug) {
-                outputArea.appendText("Grabbing definition for  " + fname + "\n");
+                System.out.println("Grabbing definition for  " + fname + "\n");
             }
             // next, grab the definition
             StickyNote temp = scope.name(fname);
@@ -2485,10 +2500,10 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             Node def = (Node) (temp.val);
 
             if (debug) {
-                outputArea.appendText("1. Got to here with fname=" + fname + "\n");
+                System.out.println("1. Got to here with fname=" + fname + "\n");
             }
             if (debug) {
-                outputArea.appendText("def is " + def.info + def.info.getClass() + "\n");
+                System.out.println("def is " + def.info + def.info.getClass() + "\n");
             }
             def = def.left().left(); //skip to the function signature
 
@@ -2496,10 +2511,10 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             while (call != null && def != null) {
                 if (testType(call, OpVal.parameterOp)) {
                     if (debug) {
-                        outputArea.appendText("Formal parameter is '" + def.left.info.val.toString() + "' \n");
+                        System.out.println("Formal parameter is '" + def.left.info.val.toString() + "' \n");
                     }
                     if (debug) {
-                        outputArea.appendText("Actual parameter is '" + evalExpression(call.left) + "' \n");
+                        System.out.println("Actual parameter is '" + evalExpression(call.left) + "' \n");
                     }
                     TreeNode formalParam = (TreeNode) def.left();
                     TreeNode actualParam = (TreeNode) call.left();
@@ -2534,7 +2549,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             }
             // Now, we should have all the parameters linked.
             if (debug) {
-                outputArea.appendText("Parameters matched \n");
+                System.out.println("Parameters matched \n");
             }
             Scope saveScope;
             boolean condition;  // Should we keep going?
@@ -2548,16 +2563,16 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             while (itercond != null && !testOp(itercond, OpVal.whileOp)) {
                 itercond = itercond.right;
                 if (debug) {
-                    outputArea.appendText("Evaling in loop:" + itercond + "\n");
+                    System.out.println("Evaling in loop:" + itercond + "\n");
                 }
             }
 
             if (debug) {
-                outputArea.appendText("Parameters matched \n");
+                System.out.println("Parameters matched \n");
             }
             // 1. Execute the generator's initialization
             if (debug) {
-                outputArea.appendText("Generator @first \n");
+                System.out.println("Generator @first \n");
             }
             def = (Node) (temp.val);
             Scope savedScope = scope;
@@ -2569,7 +2584,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             // Now begin the interpretation
             //Interpret each filter's initialization
             if (debug) {
-                outputArea.appendText("Task:init \n");
+                System.out.println("Task:init \n");
             }
             Node guardedFilter = pipeline.right();
             Node filter;
@@ -2581,13 +2596,13 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
 
             // 3. Run the generator's "Are we done?" code
             if (debug) {
-                outputArea.appendText("Generator @last \n");
+                System.out.println("Generator @last \n");
             }
             savedScope = scope;  // save the scope
             scope = myScope;
             StickyNote cond = evalStmt(genlast);
             if (debug) {
-                outputArea.appendText("@last truth value" + cond + "\n");
+                System.out.println("@last truth value" + cond + "\n");
             }
             if (!(cond.val instanceof TruthVal)) {
                 printError("@last in a generator must return a truth value", genlast);
@@ -2595,7 +2610,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
             condition = ((TruthVal) cond.val).val;
             scope = savedScope;  // restore scope
             if (debug) {
-                outputArea.appendText("Generator condition = " + condition + "\n");
+                System.out.println("Generator condition = " + condition + "\n");
             }
 
             // 4. Evaluate the condition in the global environment
@@ -2607,13 +2622,13 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 }
             }
             if (debug) {
-                outputArea.appendText("Iteration condition = " + condition + "\n");
+                System.out.println("Iteration condition = " + condition + "\n");
             }
 
             // 5.   if not, then run each task's iteration code and
             //continue with step 3
             if (debug) {
-                outputArea.appendText("Iterator @iter \n");
+                System.out.println("Iterator @iter \n");
             }
             // Interpret each body, while iterating 
             int i = 1;
@@ -2633,18 +2648,18 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 evalStmt(geniter);
                 scope = savedScope;
                 if (debug) {
-                    outputArea.appendText("Evaluating condition \n");
+                    System.out.println("Evaluating condition \n");
                 }
                 // Check to see if were done ... same as code before the loop
                 // 3. Run the generator's "Are we done?" code
                 if (debug) {
-                    outputArea.appendText("Generator @last \n");
+                    System.out.println("Generator @last \n");
                 }
                 savedScope = scope;  // save the scope
                 scope = myScope;
                 cond = evalStmt(genlast);
                 if (debug) {
-                    outputArea.appendText("@last truth value" + cond + "\n");
+                    System.out.println("@last truth value" + cond + "\n");
                 }
                 if (!(cond.val instanceof TruthVal)) {
                     printError("@last in a generator must return a truth value", genlast);
@@ -2652,7 +2667,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                 condition = ((TruthVal) cond.val).val;
                 scope = savedScope;  // restore scope
                 if (debug) {
-                    outputArea.appendText("Generator condition = " + condition + "\n");
+                    System.out.println("Generator condition = " + condition + "\n");
                 }
 
                 // 4. Evaluate the condition in the global environment
@@ -2664,7 +2679,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
                     }
                 }
                 if (debug) {
-                    outputArea.appendText("Iteration condition = " + condition + "\n");
+                    System.out.println("Iteration condition = " + condition + "\n");
                 }
             }
 
@@ -2736,7 +2751,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     StickyNote evalDelete(Node tn) {
         stmtCount++;
         if (debug) {
-            outputArea.appendText("Calling Delete with");
+            System.out.println("Calling Delete with");
             Parser.prettyPrint((TreeNode) tn);
         }
         GenesisList current = evalRef(tn.left);
@@ -2812,7 +2827,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
     }//end prepend
 
     void evalStop(Node tn) {
-        outputArea.appendText("Stop statement encountered at line "
+        System.out.println("Stop statement encountered at line "
                 + ((TreeNode) tn).context.lineNo + "\n");
         System.exit(0);
     }//end evalStop
@@ -2821,7 +2836,7 @@ public class EvaluatorXML extends GenesisDevelopmentEnvironmentViewController {
         stmtCount++;
         if (debug) {
             Parser.prettyPrint((TreeNode) tn);
-            outputArea.appendText("Unaliasing " + tn.left.info.toString() + "\n");
+            System.out.println("Unaliasing " + tn.left.info.toString() + "\n");
         }
         return scope.del(tn.left.info.toString());
     }//end evalUnalias

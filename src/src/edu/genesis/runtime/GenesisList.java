@@ -36,6 +36,14 @@
  */
 package edu.genesis.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 class GenesisList extends GV {
 
 // ---------------- Classwide constants ---------------
@@ -47,6 +55,7 @@ class GenesisList extends GV {
 // ---------------- Classwide variables ---------------
     public static boolean myQuoteStrings = true;
     public static String currentIndicator = "";
+    PrintStream o;
 // ---------------- Instance variables ----------------
     GenesisListDesc p;
 
@@ -61,6 +70,7 @@ class GenesisList extends GV {
         if (Utility.DEBUG) {
             Utility.leaving("GenesisList with", p.head);
         }
+        
     }
 
 // Create a list from a Stickynote that references a Node
@@ -93,6 +103,7 @@ class GenesisList extends GV {
         if (Utility.DEBUG) {
             Utility.leaving("GenesisList( Node v )");
         }
+        
     }
 
 // Create a list from a Node: reuse the first MN if v is a MN
@@ -123,6 +134,7 @@ class GenesisList extends GV {
         if (Utility.DEBUG) {
             Utility.leaving("GenesisList( Node v )");
         }
+        
     }
 
     GenesisList(GenesisList gl) {
@@ -156,6 +168,13 @@ class GenesisList extends GV {
         if (Utility.DEBUG) {
             Utility.leaving("init");
         }
+        try {
+            o = new PrintStream(new FileOutputStream("A.txt",true));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GenesisList.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.setOut(o);
+        System.setErr(o);
     }
 
     void done() {
